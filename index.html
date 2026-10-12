@@ -1,0 +1,1346 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Proyecto Intermodular y APA 7</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: columna de lectura con índice lateral fijo (escritorio) y bloques por fases del proyecto */
+:root{
+  --bg:#fbfaf9; --surface:#ffffff; --sunk:#f2eeec; --fg:#1d2230; --muted:#5b6170; --line:#e2dcd8;
+  --brand:#c1272d; --brand-soft:#fbe9e9; --ink:#23395b; --ink-soft:#e7edf6;
+  --ok:#1f7a4d; --ok-soft:#e3f3ea; --warn:#9a6200; --warn-soft:#fbf0d9;
+  --f-display:"Literata",Georgia,"Times New Roman",serif;
+  --f-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#14161c; --surface:#1c1f27; --sunk:#232733; --fg:#e9e6e4; --muted:#a6abb8; --line:#333847;
+  --brand:#ef5a5f; --brand-soft:#3a1d20; --ink:#9fb8de; --ink-soft:#1f2b3e;
+  --ok:#5cc58f; --ok-soft:#173226; --warn:#e8b04f; --warn-soft:#3a2c12; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14161c; --surface:#1c1f27; --sunk:#232733; --fg:#e9e6e4; --muted:#a6abb8; --line:#333847;
+  --brand:#ef5a5f; --brand-soft:#3a1d20; --ink:#9fb8de; --ink-soft:#1f2b3e;
+  --ok:#5cc58f; --ok-soft:#173226; --warn:#e8b04f; --warn-soft:#3a2c12; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-padding-top:84px}
+body{background:var(--bg);color:var(--fg);font:17px/1.6 var(--f-body);margin:0}
+a{color:var(--ink)}
+h1,h2,h3{font-family:var(--f-display);line-height:1.2;text-wrap:balance;margin:0}
+h2{font-size:clamp(1.6rem,3.2vw,2.1rem)}
+h3{font-size:1.25rem}
+p{margin:0}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px;border-radius:4px}
+code,.mono{font-family:var(--f-mono);font-size:.86em}
+
+/* Header */
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--brand);width:0;z-index:60}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top-in{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--fg);font-weight:700}
+.mark{width:34px;height:34px;border-radius:8px;background:var(--brand);color:#fff;display:grid;place-items:center;font-family:var(--f-display);font-size:1.05rem}
+.brand small{display:block;font-weight:400;color:var(--muted);font-size:.78rem;line-height:1.1}
+.search{margin-left:auto;position:relative;flex:1 1 220px;max-width:340px}
+.search input{width:100%;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--fg);font:inherit;font-size:.95rem}
+.search-res{position:absolute;top:110%;left:0;right:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 10px 30px rgb(0 0 0/.12);max-height:300px;overflow:auto;z-index:70}
+.search-res button{display:block;width:100%;text-align:left;border:0;background:none;color:var(--fg);padding:9px 12px;font:inherit;font-size:.92rem;cursor:pointer;border-bottom:1px solid var(--line)}
+.search-res button:hover,.search-res button:focus-visible{background:var(--sunk)}
+.search-res em{color:var(--muted);font-style:normal;font-size:.82rem;display:block}
+
+/* Page grid */
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;display:grid;grid-template-columns:230px minmax(0,1fr);gap:48px}
+nav.toc{position:sticky;top:84px;align-self:start;padding-block:32px;font-size:.92rem}
+nav.toc p{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;font-weight:700}
+nav.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:2px;counter-reset:t}
+nav.toc a{display:block;padding:6px 10px;border-left:2px solid var(--line);color:var(--muted);text-decoration:none}
+nav.toc a.on{border-left-color:var(--brand);color:var(--fg);font-weight:600;background:var(--brand-soft)}
+nav.toc .grp{margin-top:12px;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding-left:12px}
+main{min-width:0;padding-block:32px 80px;display:grid;gap:72px}
+section{display:grid;gap:20px;min-width:0}
+.eyebrow{font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--brand);font-weight:700}
+.lead{font-size:1.1rem;color:var(--muted);max-width:68ch}
+.prose{max-width:68ch;display:grid;gap:12px}
+
+/* Hero */
+.hero{display:grid;gap:22px;padding-block:20px 8px}
+.hero h1{font-size:clamp(2.1rem,5vw,3.3rem);max-width:18ch}
+.hero h1 span{color:var(--brand)}
+.hero-ref{font-family:var(--f-mono);font-size:.82rem;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px 14px 44px;text-indent:-28px;max-width:640px;color:var(--muted)}
+.hero-ref b{color:var(--fg);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:.82rem;padding:4px 10px;border-radius:999px;background:var(--ink-soft);color:var(--ink);font-weight:600}
+
+/* Generic blocks */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.note{border-left:3px solid var(--ink);background:var(--ink-soft);padding:12px 16px;border-radius:0 var(--r) var(--r) 0;font-size:.96rem}
+.note.warn{border-color:var(--warn);background:var(--warn-soft)}
+.note.ok{border-color:var(--ok);background:var(--ok-soft)}
+.btn{font:inherit;font-weight:600;font-size:.95rem;padding:9px 16px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.btn.brand{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{font:inherit;font-weight:600;font-size:.93rem;padding:9px 14px;border:0;background:none;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--brand)}
+.tabpanel{padding-top:18px}
+
+/* Accordion */
+details.acc{border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+details.acc+details.acc{margin-top:8px}
+details.acc summary{cursor:pointer;padding:14px 18px;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:12px}
+details.acc summary::after{content:"+";color:var(--brand);font-size:1.3rem;line-height:1}
+details.acc[open] summary::after{content:"–"}
+details.acc .acc-b{padding:0 18px 16px;display:grid;gap:10px;font-size:.98rem}
+
+/* Reference sample */
+.ref{font-family:var(--f-mono);font-size:.84rem;line-height:1.7;padding-left:2.2em;text-indent:-2.2em;background:var(--sunk);border-radius:8px;padding-block:10px;padding-right:12px;overflow-wrap:anywhere}
+.ref i{font-style:italic;color:var(--ink)}
+.anat{display:grid;gap:6px;font-size:.92rem}
+.anat span{display:inline-block;padding:1px 6px;border-radius:4px;font-weight:600}
+.k1{background:var(--brand-soft);color:var(--brand)}
+.k2{background:var(--ink-soft);color:var(--ink)}
+.k3{background:var(--ok-soft);color:var(--ok)}
+.k4{background:var(--warn-soft);color:var(--warn)}
+
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--sunk)}
+tr:last-child td{border-bottom:0}
+
+/* Builder */
+.builder{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+.field{display:grid;gap:4px}
+.field label{font-size:.82rem;font-weight:700;color:var(--muted)}
+.field input,.field select,.field textarea{font:inherit;font-size:.95rem;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);width:100%}
+.field textarea{min-height:68px;resize:vertical}
+.fields{display:grid;gap:12px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.out{display:grid;gap:14px;align-content:start}
+.out h4{margin:0;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.copy-ok{font-size:.85rem;color:var(--ok);min-height:1.2em}
+
+/* Phases */
+.phases{display:flex;gap:6px;flex-wrap:wrap;counter-reset:ph}
+.ph{flex:1 1 120px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:10px 12px;text-align:left;font:inherit;cursor:pointer;color:var(--fg);display:grid;gap:2px;position:relative}
+.ph small{font-size:.72rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;font-weight:700}
+.ph b{font-size:.92rem}
+.ph.cur{border-color:var(--brand);box-shadow:inset 0 -3px 0 var(--brand)}
+.ph.done small{color:var(--ok)}
+.ph.locked{opacity:.5;cursor:not-allowed}
+.ph.gate{border-style:dashed;border-color:var(--warn)}
+.ph-panel{display:grid;gap:14px}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:.82rem;font-weight:700;padding:3px 10px;border-radius:999px}
+.st-lock{background:var(--sunk);color:var(--muted)}
+.st-ok{background:var(--ok-soft);color:var(--ok)}
+.st-warn{background:var(--warn-soft);color:var(--warn)}
+.st-bad{background:var(--brand-soft);color:var(--brand)}
+ul.tight{margin:0;padding-left:1.2em;display:grid;gap:4px}
+
+/* Funnel */
+.funnel{display:grid;gap:6px;justify-items:center}
+.funnel button{font:inherit;font-weight:600;font-size:.93rem;border:0;cursor:pointer;padding:12px 10px;color:var(--fg);background:var(--ink-soft);border-radius:6px;transition:background .2s}
+.funnel button[aria-pressed="true"]{background:var(--brand);color:#fff}
+.funnel-txt{margin-top:6px}
+
+/* Checker */
+.verdict{padding:12px 14px;border-radius:8px;font-size:.95rem}
+
+/* Structure map */
+.struct{display:grid;gap:8px;counter-reset:s}
+.struct details{border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.struct summary{cursor:pointer;padding:12px 16px;display:flex;gap:12px;align-items:baseline;list-style:none;flex-wrap:wrap}
+.struct summary::before{counter-increment:s;content:counter(s,decimal-leading-zero);font-family:var(--f-mono);color:var(--brand);font-weight:600;font-size:.85rem}
+.struct summary b{font-weight:600}
+.struct summary em{font-style:normal;color:var(--muted);font-size:.85rem;margin-left:auto}
+.struct .b{padding:0 16px 14px 48px;display:grid;gap:8px;font-size:.95rem}
+.tag{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px}
+.t-ob{background:var(--brand-soft);color:var(--brand)}
+.t-rec{background:var(--ink-soft);color:var(--ink)}
+
+
+/* Flip cards */
+.flips{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.flip{perspective:900px;height:150px;border:0;background:none;padding:0;cursor:pointer;font:inherit;color:var(--fg)}
+.flip-in{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.flip[aria-pressed="true"] .flip-in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--r);border:1px solid var(--line);display:grid;place-items:center;padding:14px;text-align:center}
+.front{background:var(--surface);font-family:var(--f-display);font-size:1.1rem;font-weight:700}
+.back{background:var(--ink-soft);transform:rotateY(180deg);font-size:.86rem;line-height:1.45}
+
+/* Quiz */
+.q{display:grid;gap:10px}
+.q-opts{display:grid;gap:8px}
+.q-opts button{text-align:left;font:inherit;font-size:.95rem;padding:10px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);cursor:pointer}
+.q-opts button.right{border-color:var(--ok);background:var(--ok-soft)}
+.q-opts button.wrong{border-color:var(--brand);background:var(--brand-soft)}
+.q-meta{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted)}
+
+/* Checklist */
+.check{display:grid;gap:6px}
+.check label{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:6px;cursor:pointer}
+.check label:hover{background:var(--sunk)}
+.check input{margin-top:5px;accent-color:var(--brand)}
+.meter{height:8px;background:var(--sunk);border-radius:99px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--ok);width:0;transition:width .3s}
+
+/* Metodologías */
+.picker{display:flex;flex-wrap:wrap;gap:8px}
+.picker button{font:inherit;font-size:.9rem;padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.picker button:hover{border-color:var(--brand)}
+.meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.meta-grid div{background:var(--sunk);border-radius:8px;padding:12px 14px;font-size:.93rem}
+.meta-grid b{display:block;font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.ex-title{font-family:var(--f-display);font-size:1.05rem;font-weight:700;color:var(--ink)}
+
+/* Revisión: pasos */
+.rsteps{display:grid;gap:14px;counter-reset:rs}
+.rstep{display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px}
+.rstep::before{counter-increment:rs;content:counter(rs);width:36px;height:36px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-weight:700;font-family:var(--f-mono)}
+.rstep>div{display:grid;gap:10px;min-width:0}
+.bools{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.bools div{border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:.9rem;background:var(--surface)}
+.bools b{font-family:var(--f-mono);color:var(--brand)}
+.qb{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.qb fieldset{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:0;display:grid;gap:4px;font-size:.88rem}
+.qb legend{font-weight:700;font-size:.8rem;padding:0 4px;color:var(--ink)}
+.qb label{display:flex;gap:6px;align-items:flex-start;cursor:pointer;font-family:var(--f-mono);font-size:.8rem}
+.qb input{accent-color:var(--brand);margin-top:3px}
+.qstring{font-family:var(--f-mono);font-size:.82rem;background:var(--sunk);border-radius:8px;padding:12px;overflow-wrap:anywhere;line-height:1.7}
+.qstring .op{color:var(--brand);font-weight:700}
+.prisma{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);gap:10px 16px;align-items:center}
+.pbox{border:1.5px solid var(--ink);border-radius:8px;padding:10px 12px;font-size:.88rem;background:var(--surface)}
+.pbox.ex{border-color:var(--line);border-style:dashed;color:var(--muted)}
+.pbox.fin{border-color:var(--ok);background:var(--ok-soft)}
+.pbox b{font-family:var(--f-mono);font-size:1rem;color:var(--fg)}
+.plabel{grid-column:1/-1;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--brand);margin-top:4px}
+.pin{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.pin .field input{font-family:var(--f-mono)}
+.perr{color:var(--brand);font-size:.88rem;min-height:1.2em}
+@media (max-width:560px){.prisma{grid-template-columns:minmax(0,1fr)}}
+
+/* IA */
+.light{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.light>div{border-radius:var(--r);padding:14px 16px;display:grid;gap:6px;font-size:.93rem;border:1px solid var(--line);background:var(--surface)}
+.light h3{font-size:1.05rem;display:flex;align-items:center;gap:8px}
+.dot{width:12px;height:12px;border-radius:50%;flex:none}
+.d-g{background:var(--ok)}.d-a{background:var(--warn)}.d-r{background:var(--brand)}
+.scen{display:grid;gap:10px}
+.scen-item{border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:var(--surface);display:grid;gap:8px}
+.scen-btns{display:flex;flex-wrap:wrap;gap:6px}
+.scen-btns button{font:inherit;font-size:.85rem;font-weight:600;padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--fg);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.scen-btns button:disabled{cursor:default}
+.scen-btns button.pick{outline:2px solid var(--fg)}
+.scen-fb{font-size:.9rem}
+.decl-uses{display:grid;gap:4px}
+.decl-uses label{display:flex;gap:8px;align-items:flex-start;font-size:.93rem;cursor:pointer}
+.decl-uses input{margin-top:5px;accent-color:var(--brand)}
+
+.logo{display:block;height:44px;width:auto;background:#fff;border-radius:8px;padding:3px 6px}
+.brand-sub{font-size:.85rem;color:var(--muted);font-weight:600;line-height:1.2}
+/* Entregas */
+.deliv{display:grid;gap:0;position:relative}
+.dv{display:grid;grid-template-columns:28px minmax(0,1fr);gap:14px;padding-bottom:18px;position:relative}
+.dv::before{content:"";position:absolute;left:13px;top:26px;bottom:0;width:2px;background:var(--line)}
+.dv:last-child::before{display:none}
+.dv-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--ink);background:var(--surface);display:grid;place-items:center;font-family:var(--f-mono);font-size:.8rem;font-weight:700;color:var(--ink)}
+.dv.final .dv-dot{background:var(--brand);border-color:var(--brand);color:#fff}
+.dv-body{display:grid;gap:4px;padding-top:2px}
+.dv-body h3{font-size:1.08rem}
+.dv-body p{font-size:.95rem;color:var(--muted)}
+.dv.final .dv-body{background:var(--brand-soft);border-radius:var(--r);padding:12px 14px}
+.dv.final .dv-body p{color:var(--fg)}
+.alert{border:2px solid var(--brand);background:var(--brand-soft);border-radius:var(--r);padding:16px 18px;display:grid;gap:6px}
+.alert b{color:var(--brand);font-size:1.05rem}
+.where{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+/* Footer */
+footer{border-top:1px solid var(--line);margin-top:20px;background:var(--surface)}
+.foot-in{max-width:1180px;margin:0 auto;padding:28px 16px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:start;font-size:.9rem;color:var(--muted)}
+.foot-txt{display:grid;gap:10px;max-width:72ch}
+.foot-txt p{margin:0}
+.foot-txt strong{color:var(--fg)}
+.cc{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.cc-badge{display:inline-flex;gap:3px}
+.cc-badge span{font-family:var(--f-mono);font-size:.72rem;font-weight:700;border:1.5px solid var(--fg);color:var(--fg);border-radius:4px;padding:2px 5px}
+@media (max-width:560px){.foot-in{grid-template-columns:minmax(0,1fr)}}
+
+@media (max-width:900px){
+  .wrap{grid-template-columns:minmax(0,1fr);gap:0}
+  nav.toc{display:none}
+  .builder{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:480px){.row2{grid-template-columns:1fr}.struct .b{padding-left:16px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+
+<div class="progress" id="progress"></div>
+
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="https://sanidadedtech.es" target="_blank" rel="noopener">
+      <img class="logo" src="data:image/png;base64,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" alt="SanidadEdTech">
+      <span class="brand-sub">Proyecto Intermodular</span>
+    </a>
+    <div class="search">
+      <input id="q" type="search" placeholder="Buscar: DOI, objetivos, PRISMA…" aria-label="Buscar en la página" autocomplete="off">
+      <div class="search-res" id="qres" hidden></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="toc" aria-label="Índice">
+    <p>Contenido</p>
+    <ol id="toc">
+      <li class="grp">El proyecto</li>
+      <li><a href="#que-es">Qué es</a></li>
+      <li><a href="#fases">Fases y validación</a></li>
+      <li><a href="#entregas">Entregas</a></li>
+      <li><a href="#tema">Elegir el tema</a></li>
+      <li class="grp">La memoria</li>
+      <li><a href="#estructura">Apartados</a></li>
+      <li><a href="#introduccion">Introducción</a></li>
+      <li><a href="#objetivos">Objetivos</a></li>
+      <li><a href="#metodologias">Metodologías</a></li>
+      <li><a href="#revision">Revisión bibliográfica</a></li>
+      <li><a href="#ia">Uso de la IA</a></li>
+      <li class="grp">Normas APA 7</li>
+      <li><a href="#formato">Formato</a></li>
+      <li><a href="#citas">Citas en el texto</a></li>
+      <li><a href="#referencias">Referencias</a></li>
+      <li><a href="#generador">Generador</a></li>
+      <li class="grp">Repaso</li>
+      <li><a href="#glosario">Glosario</a></li>
+      <li><a href="#test">Autoevaluación</a></li>
+      <li><a href="#checklist">Lista de entrega</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero" aria-labelledby="h-hero">
+      <p class="eyebrow">Ciclos Formativos de Grado Superior · Sanidad</p>
+      <h1 id="h-hero">Tu Proyecto Intermodular, <span>de la idea a la defensa</span></h1>
+      <p class="lead">Cómo se elige el tema, qué ocurre cuando la tutora lo valida, cómo se escriben la introducción y los objetivos, qué apartados lleva la memoria y cómo citar con normas APA 7.ª edición.</p>
+      <div class="hero-ref" aria-label="Ejemplo de referencia APA">
+        <b>American Psychological Association.</b> (2020). <i>Publication manual of the American Psychological Association</i> (7th ed.). https://doi.org/10.1037/0000165-000
+      </div>
+      <div class="chips"><span class="chip">Elección del tema</span><span class="chip">Validación de la tutora</span><span class="chip">Introducción y objetivos</span><span class="chip">APA 7</span><span class="chip">Generador de referencias</span></div>
+    </section>
+
+    <!-- QUÉ ES -->
+    <section id="que-es" aria-labelledby="h-que">
+      <p class="eyebrow">El proyecto</p>
+      <h2 id="h-que">Qué es el Proyecto Intermodular</h2>
+      <div class="prose">
+        <p>Es el módulo en el que demuestras que sabes <strong>integrar lo aprendido en varios módulos del ciclo</strong> para resolver un problema real del sector sanitario. Con la nueva ordenación de la FP (Ley Orgánica 3/2022 y su desarrollo), el antiguo módulo de «Proyecto» pasa a llamarse <strong>Proyecto Intermodular</strong>, y su nombre ya indica lo que se espera: que tu trabajo conecte contenidos de distintos módulos, no que repita uno solo.</p>
+        <p>El resultado es una <strong>memoria escrita</strong> (o un producto con su memoria: una guía, un protocolo, un recurso digital, un plan de formación…) que defiendes ante un tribunal o ante tu tutora. Las fechas, la extensión y los criterios concretos los fija tu centro: consulta siempre la guía del módulo.</p>
+      </div>
+      <div class="grid3">
+        <div class="card"><h3>Integra</h3><p style="margin-top:6px;color:var(--muted)">Relaciona al menos dos o tres módulos del ciclo y justifica en la memoria qué aporta cada uno.</p></div>
+        <div class="card"><h3>Resuelve</h3><p style="margin-top:6px;color:var(--muted)">Parte de una necesidad real: un servicio, un centro, un colectivo de pacientes, un procedimiento mejorable.</p></div>
+        <div class="card"><h3>Documenta</h3><p style="margin-top:6px;color:var(--muted)">Todo lo que afirmas se apoya en fuentes fiables citadas en APA 7. Lo que no se cita, no se puede defender.</p></div>
+      </div>
+    </section>
+
+    <!-- FASES -->
+    <section id="fases" aria-labelledby="h-fases">
+      <p class="eyebrow">El proyecto</p>
+      <h2 id="h-fases">Fases y validación del tema</h2>
+      <p class="lead">El proyecto avanza por fases. La segunda es una <strong>puerta</strong>: hasta que la tutora no valida tu propuesta, no se pasa a la planificación. Prueba la simulación pulsando cada fase.</p>
+
+      <div class="phases" id="phases" role="tablist" aria-label="Fases del proyecto"></div>
+      <div class="card ph-panel" id="phPanel" aria-live="polite"></div>
+    </section>
+
+    <!-- ENTREGAS -->
+    <section id="entregas" aria-labelledby="h-ent">
+      <p class="eyebrow">El proyecto</p>
+      <h2 id="h-ent">Entregas</h2>
+      <div class="prose">
+        <p>El proyecto no se entrega de una vez al final. Se realizan <strong>entregas parciales</strong> a lo largo del curso, y la <strong>entrega final</strong> está formada por el trabajo completo junto con la presentación para la defensa.</p>
+        <p>Cada entrega parcial recibe la corrección de la tutora. Incorpora esas correcciones antes de la siguiente: así la memoria final se construye paso a paso.</p>
+      </div>
+
+      <div class="alert" role="note">
+        <b>No entregar implica suspender el proyecto.</b>
+        <p>Todas las entregas, parciales y final, son obligatorias. Si no realizas alguna en el plazo indicado, el Proyecto Intermodular queda suspendido.</p>
+      </div>
+
+      <div class="card" style="display:grid;gap:14px">
+        <h3>Recorrido de las entregas</h3>
+        <p style="font-size:.93rem;color:var(--muted)">Ejemplo orientativo de cómo se van sumando los apartados. El número de entregas parciales y lo que incluye cada una lo fija la programación didáctica de tu grupo.</p>
+        <div class="deliv">
+          <div class="dv"><span class="dv-dot">1</span><div class="dv-body"><h3>Propuesta de tema</h3><p>Ficha de propuesta para la validación de la tutora.</p></div></div>
+          <div class="dv"><span class="dv-dot">2</span><div class="dv-body"><h3>Entrega parcial</h3><p>Por ejemplo: introducción, objetivos y metodología, con las primeras referencias en APA 7.</p></div></div>
+          <div class="dv"><span class="dv-dot">3</span><div class="dv-body"><h3>Entrega parcial</h3><p>Por ejemplo: desarrollo o resultados, incorporando las correcciones de la entrega anterior.</p></div></div>
+          <div class="dv final"><span class="dv-dot">F</span><div class="dv-body"><h3>Entrega final</h3><p><b>Trabajo completo</b> con todos los apartados revisados <b>+ presentación</b> para la defensa oral.</p></div></div>
+        </div>
+      </div>
+
+      <h3>Dónde consultar qué entregar y cuánto vale</h3>
+      <div class="where">
+        <div class="card"><h3>Plataforma del curso</h3><p style="margin-top:6px;color:var(--muted)">Fechas límite, instrucciones de cada tarea, plantillas y formato de archivo. Revísala con frecuencia: las fechas no se amplían por no haberla consultado.</p></div>
+        <div class="card"><h3>Programación didáctica</h3><p style="margin-top:6px;color:var(--muted)">Qué contenido corresponde a cada entrega, qué porcentaje de la nota tiene cada una y con qué criterios se califica.</p></div>
+      </div>
+      <div class="note warn"><b>Antes de cada entrega</b>, comprueba en la plataforma el nombre del archivo, el formato pedido (PDF, Word, presentación) y que has subido la versión correcta. Una entrega con el archivo equivocado o vacío cuenta como no entregada.</div>
+    </section>
+
+    <!-- TEMA -->
+    <section id="tema" aria-labelledby="h-tema">
+      <p class="eyebrow">Fase 1</p>
+      <h2 id="h-tema">Cómo elegir un buen tema</h2>
+      <div class="prose">
+        <p>El tema lo propone el alumnado. Un buen tema no es el más original: es el que puedes <strong>terminar en el plazo</strong>, con <strong>fuentes disponibles</strong> y que demuestra competencias de tu título. Antes de presentarlo, pásale este filtro:</p>
+      </div>
+      <div class="tbl"><table>
+        <thead><tr><th>Criterio</th><th>Pregunta que debes poder responder</th><th>Señal de alerta</th></tr></thead>
+        <tbody>
+          <tr><td><b>Pertinencia</b></td><td>¿Está relacionado con las competencias de mi título?</td><td>Lo podría hacer igual alguien de otro ciclo.</td></tr>
+          <tr><td><b>Carácter intermodular</b></td><td>¿Qué módulos del ciclo intervienen y qué aporta cada uno?</td><td>Solo encaja en un módulo.</td></tr>
+          <tr><td><b>Viabilidad</b></td><td>¿Lo termino con el tiempo, los medios y el acceso que tengo?</td><td>Necesita datos de pacientes que no puedo obtener legalmente.</td></tr>
+          <tr><td><b>Delimitación</b></td><td>¿Puedo resumirlo en una frase con población, lugar y producto?</td><td>Títulos como «La historia clínica» o «Las emergencias».</td></tr>
+          <tr><td><b>Fundamentación</b></td><td>¿Encuentro bibliografía actual (últimos 5–10 años) y fuentes oficiales?</td><td>Solo encuentro blogs o webs comerciales.</td></tr>
+          <tr><td><b>Ética y legalidad</b></td><td>¿Respeta la protección de datos y la confidencialidad?</td><td>Fotografías o informes reales sin anonimizar.</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Del tema amplio al tema delimitado</h3>
+      <div class="tabs" role="tablist" aria-label="Ejemplos por ciclo" id="temaTabs">
+        <button role="tab" aria-selected="true" data-t="t2">Documentación Sanitaria</button>
+        <button role="tab" aria-selected="false" data-t="t3">Coordinación de Emergencias</button>
+        <button role="tab" aria-selected="false" data-t="t4">Emergencias y Protección Civil</button>
+      </div>
+      <div class="tabpanel" id="t2" role="tabpanel">
+        <div class="grid2">
+          <div class="note warn"><b>Amplio:</b> La codificación clínica.</div>
+          <div class="note ok"><b>Delimitado:</b> Propuesta de un procedimiento de auditoría interna de la calidad de la codificación CIE-10-ES de altas hospitalarias en un servicio de Medicina Interna.<br><small>Módulos: Sistemas de información y clasificación · Gestión administrativa sanitaria</small></div>
+        </div>
+      </div>
+      <div class="tabpanel" id="t3" role="tabpanel" hidden>
+        <div class="grid2">
+          <div class="note warn"><b>Amplio:</b> Ayuda a las víctimas de desastres.</div>
+          <div class="note ok"><b>Delimitado:</b> Plan de formación para voluntariado en apoyo psicosocial inmediato a personas afectadas por inundaciones en un municipio costero.<br><small>Módulos: Planificación de acciones formativas · Supervisión del apoyo a afectados</small></div>
+        </div>
+      </div>
+      <div class="tabpanel" id="t4" role="tabpanel" hidden>
+        <div class="grid2">
+          <div class="note warn"><b>Amplio:</b> Los incendios forestales.</div>
+          <div class="note ok"><b>Delimitado:</b> Protocolo de coordinación de equipos en la primera intervención ante un incendio de interfaz urbano-forestal en una urbanización concreta.<br><small>Módulos: Coordinación de equipos y unidades · Intervención operativa en sucesos</small></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ESTRUCTURA -->
+    <section id="estructura" aria-labelledby="h-est">
+      <p class="eyebrow">La memoria</p>
+      <h2 id="h-est">Apartados de la memoria</h2>
+      <p class="lead">Estos son los apartados que debe tener la memoria de un proyecto de FP sanitaria, en este orden. Pulsa cada uno para ver qué debe contener.</p>
+      <div class="struct" id="struct"></div>
+    </section>
+
+    <!-- INTRODUCCIÓN -->
+    <section id="introduccion" aria-labelledby="h-intro">
+      <p class="eyebrow">La memoria</p>
+      <h2 id="h-intro">Cómo se escribe la introducción</h2>
+      <div class="prose">
+        <p>La introducción funciona como un <strong>embudo</strong>: empieza en el contexto general y se va estrechando hasta tu proyecto concreto. Responde a tres preguntas: <em>¿qué se sabe?</em>, <em>¿qué falta o qué problema hay?</em> y <em>¿qué voy a hacer yo?</em> Cada afirmación que no sea tuya lleva su cita.</p>
+        <p>Pulsa cada nivel del embudo para ver un ejemplo de párrafo (proyecto de auditoría de la codificación, del ciclo de Documentación Sanitaria).</p>
+      </div>
+      <div class="card">
+        <div class="funnel" id="funnel"></div>
+        <div class="funnel-txt" id="funnelTxt" aria-live="polite"></div>
+      </div>
+      <div class="grid2">
+        <div class="note ok"><b>Sí</b><ul class="tight"><li>Tercera persona o impersonal («se propone», «este proyecto»).</li><li>Datos con fuente y año.</li><li>Párrafos de 4–8 líneas, una idea por párrafo.</li><li>Terminar con el propósito del proyecto, que enlaza con los objetivos.</li></ul></div>
+        <div class="note warn"><b>Evita</b><ul class="tight"><li>Empezar por la historia de la técnica desde el siglo XIX.</li><li>Copiar definiciones de Wikipedia.</li><li>Opiniones sin respaldo («todo el mundo sabe que…»).</li><li>Adelantar resultados o conclusiones.</li></ul></div>
+      </div>
+    </section>
+
+    <!-- OBJETIVOS -->
+    <section id="objetivos" aria-labelledby="h-obj">
+      <p class="eyebrow">La memoria</p>
+      <h2 id="h-obj">Cómo se redactan los objetivos</h2>
+      <div class="grid2">
+        <div class="card"><h3>Objetivo general</h3><p style="margin-top:6px">Uno solo. Expresa el propósito global del proyecto. Coincide en esencia con el título.</p><p class="ref" style="margin-top:10px">Diseñar un procedimiento de auditoría interna de la calidad de la codificación CIE-10-ES de las altas hospitalarias de un servicio de Medicina Interna.</p></div>
+        <div class="card"><h3>Objetivos específicos</h3><p style="margin-top:6px">Entre 3 y 5. Son los pasos que, sumados, cumplen el general. Cada uno tendrá su reflejo en la metodología y en los resultados.</p>
+          <ul class="tight" style="margin-top:10px;font-size:.93rem"><li>Identificar los errores de codificación más frecuentes descritos en la bibliografía.</li><li>Definir los criterios de calidad y los indicadores que se revisarán en cada auditoría.</li><li>Elaborar la hoja de registro de la auditoría y el circuito de devolución de resultados.</li><li>Comprobar la aplicabilidad del procedimiento con una muestra de casos simulados.</li></ul></div>
+      </div>
+      <div class="note"><b>Fórmula:</b> verbo en infinitivo + qué + a quién o dónde + cómo o con qué. Los objetivos deben ser <b>concretos, medibles, alcanzables, pertinentes y acotados en el tiempo</b> (SMART).</div>
+
+      <div class="tbl"><table>
+        <thead><tr><th>Nivel</th><th>Verbos adecuados</th></tr></thead>
+        <tbody>
+          <tr><td>Conocer / describir</td><td>identificar, describir, enumerar, definir, clasificar</td></tr>
+          <tr><td>Analizar</td><td>analizar, comparar, relacionar, examinar, determinar</td></tr>
+          <tr><td>Crear</td><td>diseñar, elaborar, desarrollar, proponer, planificar</td></tr>
+          <tr><td>Evaluar</td><td>evaluar, valorar, verificar, medir, contrastar</td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="card" style="display:grid;gap:12px">
+        <h3>Comprueba tu objetivo</h3>
+        <div class="field"><label for="objIn">Escribe un objetivo</label><input id="objIn" value="Conocer la codificación de las altas hospitalarias"></div>
+        <div class="btns"><button class="btn primary" id="objBtn">Revisar</button></div>
+        <div id="objOut" class="verdict" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- METODOLOGÍAS -->
+    <section id="metodologias" aria-labelledby="h-met">
+      <p class="eyebrow">La memoria · Ejemplos de Documentación Sanitaria</p>
+      <h2 id="h-met">Metodologías del proyecto</h2>
+      <div class="prose">
+        <p>La metodología explica <strong>cómo</strong> vas a conseguir los objetivos. Depende del tipo de proyecto, y el tipo depende de lo que quieras obtener al final. Todos los ejemplos son de TS en Documentación y Administración Sanitarias.</p>
+        <p><b>¿Qué quieres conseguir?</b> Pulsa la opción que más se parezca a tu idea:</p>
+      </div>
+      <div class="picker" id="metPicker">
+        <button data-t="m1">Saber qué dice la bibliografía sobre un tema</button>
+        <button data-t="m2">Medir cómo está algo en un servicio real</button>
+        <button data-t="m3">Ordenar cómo se hace una tarea</button>
+        <button data-t="m4">Corregir un problema que se repite</button>
+        <button data-t="m5">Conocer la opinión o los conocimientos del personal</button>
+        <button data-t="m6">Crear una herramienta</button>
+      </div>
+      <div class="tabs" role="tablist" aria-label="Metodologías" id="metTabs">
+        <button role="tab" aria-selected="true" data-t="m1">Revisión bibliográfica</button>
+        <button role="tab" aria-selected="false" data-t="m2">Estudio descriptivo</button>
+        <button role="tab" aria-selected="false" data-t="m3">Diseño de procedimiento</button>
+        <button role="tab" aria-selected="false" data-t="m4">Proyecto de mejora</button>
+        <button role="tab" aria-selected="false" data-t="m5">Encuesta</button>
+        <button role="tab" aria-selected="false" data-t="m6">Diseño de herramienta</button>
+      </div>
+
+      <div class="tabpanel" id="m1" role="tabpanel">
+        <div class="card" style="display:grid;gap:14px">
+          <p class="ex-title">Factores que influyen en la exactitud de la codificación clínica con CIE-10-ES</p>
+          <p>Se busca, selecciona y analiza lo publicado sobre una pregunta concreta. No se recogen datos nuevos: los «datos» son los artículos. Es la metodología más viable cuando no hay acceso a un centro, y la que se explica paso a paso en el <a href="#revision">apartado siguiente</a>.</p>
+          <div class="tbl"><table>
+            <thead><tr><th>Tipo de revisión</th><th>Qué es</th><th>¿Para FP?</th></tr></thead>
+            <tbody>
+              <tr><td><b>Narrativa</b></td><td>Resume y comenta la bibliografía sobre un tema con una búsqueda descrita, pero sin un protocolo cerrado.</td><td>La más habitual. Exige explicar dónde y cómo se buscó.</td></tr>
+              <tr><td><b>Sistemática</b></td><td>Responde a una pregunta muy concreta con un protocolo previo, búsqueda exhaustiva en varias bases, criterios explícitos y evaluación de calidad. Sigue la declaración PRISMA 2020.</td><td>Posible en versión simplificada («revisión con metodología sistemática»).</td></tr>
+              <tr><td><b>Integradora</b></td><td>Combina estudios de distinto diseño (cuantitativos, cualitativos, documentos técnicos) para dar una visión completa.</td><td>Útil en temas de gestión y documentación, donde hay poca investigación clínica.</td></tr>
+              <tr><td><b>De alcance (scoping review)</b></td><td>Mapea qué se ha publicado sobre un tema amplio y qué lagunas hay, sin evaluar la calidad de cada estudio.</td><td>Adecuada para temas nuevos (inteligencia artificial en codificación, por ejemplo).</td></tr>
+              <tr><td><b>Metaanálisis</b></td><td>Combina estadísticamente los resultados de varios estudios.</td><td>Fuera del alcance de un proyecto de FP.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <div class="tabpanel" id="m2" role="tabpanel" hidden>
+        <div class="card" style="display:grid;gap:14px">
+          <p class="ex-title">Calidad de cumplimentación del informe de alta en un servicio de Medicina Interna</p>
+          <p>Se observa y describe una realidad, sin intervenir en ella. En Documentación Sanitaria suele tomar la forma de <b>auditoría de historias clínicas</b>: se revisa una muestra de documentos y se mide si cumplen unos requisitos.</p>
+          <div class="meta-grid">
+            <div><b>Muestra</b>Informes de alta anonimizados de un periodo concreto, seleccionados de forma aleatoria o consecutiva.</div>
+            <div><b>Variables</b>Presencia de diagnóstico principal, diagnósticos secundarios, procedimientos, fechas, firma del facultativo, legibilidad.</div>
+            <div><b>Instrumento</b>Hoja de recogida de datos en Excel con una columna por variable (sí / no / incompleto).</div>
+            <div><b>Análisis</b>Frecuencias y porcentajes de cumplimiento por variable, con tablas y gráficos.</div>
+          </div>
+          <div class="note warn">Solo con autorización del centro y datos anonimizados. Si no tienes acceso a documentos reales, trabaja con casos simulados que te facilite el profesorado y dilo en la memoria.</div>
+        </div>
+      </div>
+
+      <div class="tabpanel" id="m3" role="tabpanel" hidden>
+        <div class="card" style="display:grid;gap:14px">
+          <p class="ex-title">Procedimiento de atención a las solicitudes de acceso a la historia clínica por el paciente</p>
+          <p>El producto es un <b>documento normalizado</b> que define quién hace qué, cuándo y cómo. Se apoya en la normativa (Ley 41/2002, protección de datos) y en el análisis de cómo se trabaja ahora.</p>
+          <div class="meta-grid">
+            <div><b>1. Análisis</b>Cómo se gestiona hoy la tarea y qué problemas tiene.</div>
+            <div><b>2. Marco normativo</b>Requisitos legales y plazos que el procedimiento debe cumplir.</div>
+            <div><b>3. Diseño</b>Diagrama de flujo de la tarea, responsables y documentos que se generan.</div>
+            <div><b>4. Documento final</b>Objeto, alcance, responsables, descripción de pasos, registros, indicadores y anexos (modelos de solicitud).</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabpanel" id="m4" role="tabpanel" hidden>
+        <div class="card" style="display:grid;gap:14px">
+          <p class="ex-title">Plan de mejora para reducir los documentos sin asociar a episodio en la historia clínica electrónica</p>
+          <p>Parte de un problema concreto y propone acciones para resolverlo, siguiendo el <b>ciclo de mejora continua PDCA</b> (planificar, hacer, verificar, actuar).</p>
+          <div class="meta-grid">
+            <div><b>Planificar</b>Describir el problema con datos, buscar causas (diagrama de Ishikawa o de espina de pescado) y priorizarlas.</div>
+            <div><b>Hacer</b>Proponer acciones: formación, cambios en el circuito, comprobaciones automáticas.</div>
+            <div><b>Verificar</b>Definir indicadores, por ejemplo el porcentaje de documentos sin episodio por mes.</div>
+            <div><b>Actuar</b>Qué se hará si el indicador mejora o si no lo hace.</div>
+          </div>
+          <p style="font-size:.93rem;color:var(--muted)">En el plazo del módulo normalmente se llega a planificar y a proponer; la verificación se describe como se haría.</p>
+        </div>
+      </div>
+
+      <div class="tabpanel" id="m5" role="tabpanel" hidden>
+        <div class="card" style="display:grid;gap:14px">
+          <p class="ex-title">Conocimientos del personal administrativo de un centro de salud sobre protección de datos en la atención al usuario</p>
+          <p>Se recogen datos con un <b>cuestionario</b>. Si existe uno validado sobre el tema, se usa citándolo; si no, se elabora uno propio («ad hoc») y lo revisan personas expertas antes de pasarlo.</p>
+          <div class="meta-grid">
+            <div><b>Población</b>Quién responde y cómo se le invita a participar.</div>
+            <div><b>Cuestionario</b>Preguntas cerradas (sí/no, opción múltiple, escala de 1 a 5) y alguna abierta. Pocas y claras.</div>
+            <div><b>Recogida</b>Formulario en línea anónimo, con una presentación que explique el objetivo y el carácter voluntario.</div>
+            <div><b>Análisis</b>Porcentajes por pregunta y comparación entre grupos si tiene sentido.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabpanel" id="m6" role="tabpanel" hidden>
+        <div class="card" style="display:grid;gap:14px">
+          <p class="ex-title">Base de datos para el registro y seguimiento de las solicitudes de documentación clínica</p>
+          <p>El producto es una herramienta: una base de datos, una hoja de cálculo con fórmulas, un formulario, un cuadro de mando. La metodología describe las fases de desarrollo.</p>
+          <div class="meta-grid">
+            <div><b>Requisitos</b>Qué necesita el servicio: campos, usuarios, informes.</div>
+            <div><b>Diseño</b>Estructura de tablas o pantallas, antes de construir nada.</div>
+            <div><b>Desarrollo</b>Construcción con la herramienta elegida (Access, Excel, LibreOffice Base…).</div>
+            <div><b>Prueba</b>Comprobación con datos ficticios y manual de uso breve.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REVISIÓN BIBLIOGRÁFICA -->
+    <section id="revision" aria-labelledby="h-rev">
+      <p class="eyebrow">La memoria · Ejemplo de Documentación Sanitaria</p>
+      <h2 id="h-rev">Cómo se hace una revisión bibliográfica</h2>
+      <div class="prose">
+        <p>Una revisión bibliográfica no es «buscar en Google y resumir». Es un proceso ordenado y <strong>reproducible</strong>: otra persona que siga tus pasos debería encontrar los mismos artículos. Por eso cada paso se anota y se cuenta en la metodología.</p>
+        <p>Ejemplo que seguimos: <b>factores que influyen en la exactitud de la codificación clínica con CIE-10-ES.</b></p>
+      </div>
+
+      <div class="rsteps">
+        <div class="rstep"><div>
+          <h3>Formula la pregunta</h3>
+          <p>Usa el formato <b>PIO</b> (o PICO si comparas dos intervenciones). Cada letra será después un bloque de la búsqueda.</p>
+          <div class="tbl"><table>
+            <thead><tr><th>Elemento</th><th>Significado</th><th>En el ejemplo</th></tr></thead>
+            <tbody>
+              <tr><td><b>P</b></td><td>Población o problema</td><td>Episodios de hospitalización codificados con CIE-10</td></tr>
+              <tr><td><b>I</b></td><td>Intervención, exposición o factor</td><td>Factores: calidad de la documentación clínica, formación y experiencia de quien codifica, auditorías</td></tr>
+              <tr><td><b>C</b></td><td>Comparación (opcional)</td><td>—</td></tr>
+              <tr><td><b>O</b></td><td>Resultado (outcome)</td><td>Exactitud de la codificación, errores y su efecto en los GRD</td></tr>
+            </tbody>
+          </table></div>
+          <p class="ref">¿Qué factores influyen en la exactitud de la codificación clínica de los episodios de hospitalización?</p>
+        </div></div>
+
+        <div class="rstep"><div>
+          <h3>Traduce la pregunta a descriptores</h3>
+          <p>Las bases de datos indexan los artículos con un vocabulario controlado: <b>MeSH</b> en inglés (PubMed) y <b>DeCS</b> en español (BVS, LILACS, IBECS). Busca el descriptor exacto y añade sinónimos en texto libre para no perder artículos.</p>
+          <div class="tbl"><table>
+            <thead><tr><th>Concepto</th><th>DeCS (español)</th><th>MeSH (inglés)</th><th>Texto libre</th></tr></thead>
+            <tbody>
+              <tr><td>Codificación</td><td>Codificación Clínica</td><td>Clinical Coding</td><td>medical coding, coding accuracy</td></tr>
+              <tr><td>Clasificación</td><td>Clasificación Internacional de Enfermedades</td><td>International Classification of Diseases</td><td>ICD-10, ICD-10-CM, ICD-10-PCS</td></tr>
+              <tr><td>Exactitud</td><td>Exactitud de los Datos</td><td>Data Accuracy</td><td>coding errors, coding quality</td></tr>
+              <tr><td>GRD</td><td>Grupos Diagnósticos Relacionados</td><td>Diagnosis-Related Groups</td><td>DRG</td></tr>
+              <tr><td>Auditoría</td><td>Auditoría Médica</td><td>Medical Audit</td><td>coding audit</td></tr>
+            </tbody>
+          </table></div>
+          <p style="font-size:.93rem;color:var(--muted)">Comprueba siempre los descriptores en el buscador oficial de DeCS (decs.bvsalud.org) y de MeSH (www.ncbi.nlm.nih.gov/mesh).</p>
+        </div></div>
+
+        <div class="rstep"><div>
+          <h3>Construye la ecuación de búsqueda</h3>
+          <div class="bools">
+            <div><b>OR</b> une sinónimos del mismo concepto. Amplía: más resultados.</div>
+            <div><b>AND</b> une conceptos distintos. Restringe: todos deben aparecer.</div>
+            <div><b>NOT</b> excluye un término. Úsalo con cuidado: puede eliminar artículos útiles.</div>
+            <div><b>" "</b> busca la frase exacta. <b>*</b> trunca: <span class="mono">codif*</span> encuentra codificación, codificador…</div>
+          </div>
+          <p>Marca o desmarca términos y observa cómo cambia la ecuación para PubMed. Los sinónimos de cada bloque se unen con OR y los bloques entre sí con AND.</p>
+          <div class="qb" id="qb"></div>
+          <div class="pin">
+            <div class="field"><label for="qbFrom">Desde el año</label><input id="qbFrom" type="number" value="2016" min="1990" max="2026"></div>
+            <div class="field"><label for="qbLang">Idiomas</label><select id="qbLang"><option value="es-en">Español e inglés</option><option value="en">Solo inglés</option><option value="any">Sin filtro</option></select></div>
+          </div>
+          <p class="qstring" id="qbOut"></p>
+          <div class="btns"><button class="btn primary" id="qbCopy">Copiar ecuación</button><span class="copy-ok" id="qbOk" aria-live="polite"></span></div>
+          <p style="font-size:.93rem">En bases en español (Dialnet, SciELO, IBECS) usa términos en español y ecuaciones más sencillas, por ejemplo: <span class="mono">"codificación clínica" AND (CIE-10 OR "CIE-10-ES") AND (calidad OR errores)</span>.</p>
+        </div></div>
+
+        <div class="rstep"><div>
+          <h3>Elige las bases de datos</h3>
+          <p>Usa al menos tres: una internacional, una en español y una fuente institucional. Google Académico sirve para completar, no como base principal.</p>
+          <div class="tbl"><table>
+            <thead><tr><th>Fuente</th><th>Qué contiene</th><th>Para el ejemplo</th></tr></thead>
+            <tbody>
+              <tr><td><b>PubMed / MEDLINE</b></td><td>Biomedicina internacional, acceso gratuito, descriptores MeSH.</td><td>Estudios sobre exactitud de la codificación y GRD.</td></tr>
+              <tr><td><b>Scopus / Web of Science</b></td><td>Multidisciplinares; suele haber acceso desde universidades o consejerías.</td><td>Gestión sanitaria y sistemas de información.</td></tr>
+              <tr><td><b>BVS (LILACS, IBECS)</b></td><td>Ciencias de la salud en español y portugués, descriptores DeCS.</td><td>Trabajos de España y Latinoamérica.</td></tr>
+              <tr><td><b>SciELO</b></td><td>Revistas iberoamericanas en acceso abierto.</td><td>Artículos en español sobre documentación clínica.</td></tr>
+              <tr><td><b>Dialnet</b></td><td>Producción científica en español, incluidas revistas de gestión y documentación.</td><td>Revistas españolas de documentación médica.</td></tr>
+              <tr><td><b>Fuentes oficiales</b></td><td>Ministerio de Sanidad, BOE, consejerías.</td><td>Manuales y boletines de codificación CIE-10-ES y normativa del CMBD.</td></tr>
+            </tbody>
+          </table></div>
+        </div></div>
+
+        <div class="rstep"><div>
+          <h3>Define los criterios de inclusión y exclusión</h3>
+          <p>Se deciden <b>antes</b> de leer los resultados y se aplican igual a todos los artículos.</p>
+          <div class="grid2">
+            <div class="note ok"><b>Inclusión</b><ul class="tight"><li>Publicados en los últimos 10 años.</li><li>En español o inglés.</li><li>Estudian la exactitud o los errores de codificación con CIE-10 o sus modificaciones clínicas.</li><li>Texto completo disponible.</li></ul></div>
+            <div class="note warn"><b>Exclusión</b><ul class="tight"><li>Cartas al director y artículos de opinión.</li><li>Estudios sobre CIE-9 exclusivamente.</li><li>Codificación de mortalidad (certificados de defunción), si no es el tema.</li><li>Duplicados.</li></ul></div>
+          </div>
+        </div></div>
+
+        <div class="rstep"><div>
+          <h3>Criba los resultados y dibuja el diagrama de flujo</h3>
+          <p>Se cuentan los artículos en cada fase: se eliminan los duplicados, se lee el título y el resumen, y después el texto completo de los que quedan. El diagrama de flujo (modelo PRISMA 2020) muestra ese recorrido. Cambia las cifras del ejemplo para ver cómo se recalcula.</p>
+          <div class="pin">
+            <div class="field"><label for="pP">PubMed</label><input id="pP" type="number" min="0" value="142"></div>
+            <div class="field"><label for="pS">Scopus</label><input id="pS" type="number" min="0" value="118"></div>
+            <div class="field"><label for="pB">BVS / SciELO</label><input id="pB" type="number" min="0" value="27"></div>
+            <div class="field"><label for="pD">Dialnet</label><input id="pD" type="number" min="0" value="19"></div>
+            <div class="field"><label for="pDup">Duplicados</label><input id="pDup" type="number" min="0" value="74"></div>
+            <div class="field"><label for="pT">Excluidos por título y resumen</label><input id="pT" type="number" min="0" value="181"></div>
+            <div class="field"><label for="pNA">Texto completo no disponible</label><input id="pNA" type="number" min="0" value="9"></div>
+            <div class="field"><label for="pF">Excluidos tras leer el texto completo</label><input id="pF" type="number" min="0" value="26"></div>
+          </div>
+          <p class="perr" id="pErr" aria-live="polite"></p>
+          <div class="prisma" id="prisma"></div>
+          <p style="font-size:.85rem;color:var(--muted)">Cifras de ejemplo, no resultados reales de esta búsqueda.</p>
+        </div></div>
+
+        <div class="rstep"><div>
+          <h3>Evalúa la calidad de los artículos</h3>
+          <p>No todos los artículos valen lo mismo. Para cada uno, anota el diseño del estudio (revisión, estudio transversal, cohortes…) y valora su calidad con una herramienta de lectura crítica, como las <b>plantillas CASPe</b> (en español) o las listas de comprobación del <b>Joanna Briggs Institute</b>. Prioriza revistas con revisión por pares y fuentes oficiales.</p>
+        </div></div>
+
+        <div class="rstep"><div>
+          <h3>Extrae los datos en una tabla</h3>
+          <p>Una fila por artículo incluido. Esta tabla va en el apartado de resultados y es la base de la síntesis.</p>
+          <div class="tbl"><table>
+            <thead><tr><th>Autor y año</th><th>País</th><th>Diseño</th><th>Muestra</th><th>Factor estudiado</th><th>Resultado principal</th></tr></thead>
+            <tbody>
+              <tr><td>Apellido et al. (año)</td><td>España</td><td>Transversal</td><td>Nº de altas auditadas</td><td>Calidad del informe de alta</td><td>Lo que encontró el estudio, con tus palabras</td></tr>
+              <tr><td colspan="6" style="color:var(--muted);font-size:.88rem">Fila de ejemplo: completa una por cada artículo incluido.</td></tr>
+            </tbody>
+          </table></div>
+        </div></div>
+
+        <div class="rstep"><div>
+          <h3>Sintetiza por temas</h3>
+          <p>No resumas artículo por artículo. Agrupa los hallazgos en categorías que respondan a la pregunta (en el ejemplo: factores de la documentación clínica, factores de la persona que codifica, factores organizativos) y compara lo que dicen los distintos autores, citando a cada uno.</p>
+        </div></div>
+
+        <div class="rstep"><div>
+          <h3>Gestiona las referencias</h3>
+          <p>Un gestor bibliográfico gratuito como <b>Zotero</b> o <b>Mendeley</b> guarda los artículos, elimina duplicados e inserta citas y referencias en APA 7 desde Word o LibreOffice. Revisa siempre el resultado: los gestores también se equivocan.</p>
+        </div></div>
+      </div>
+
+      <div class="card" style="display:grid;gap:10px">
+        <h3>Así queda en la metodología de la memoria</h3>
+        <p class="ref" style="padding-left:12px;text-indent:0;line-height:1.75">Se realizó una revisión bibliográfica narrativa entre [mes] y [mes] de [año] en las bases de datos PubMed, Scopus, BVS, SciELO y Dialnet, completada con documentos del Ministerio de Sanidad. Se emplearon los descriptores DeCS/MeSH «Codificación Clínica» / <i>Clinical Coding</i>, «Clasificación Internacional de Enfermedades» / <i>International Classification of Diseases</i> y «Exactitud de los Datos» / <i>Data Accuracy</i>, combinados con los operadores booleanos AND y OR. Se incluyeron artículos publicados entre [año] y [año], en español o inglés, que estudiaran la exactitud de la codificación con CIE-10 o sus modificaciones clínicas. Se excluyeron cartas, artículos de opinión y estudios centrados en CIE-9. El proceso de selección se resume en la Figura 1.</p>
+      </div>
+    </section>
+
+    <!-- IA -->
+    <section id="ia" aria-labelledby="h-ia">
+      <p class="eyebrow">La memoria</p>
+      <h2 id="h-ia">Uso de la inteligencia artificial</h2>
+      <div class="prose">
+        <p>Las herramientas de inteligencia artificial generativa (ChatGPT, Claude, Gemini, Copilot…) pueden ayudarte en el proyecto, igual que un diccionario o un corrector. Pero el proyecto evalúa <strong>tus</strong> competencias: lo que entregas tiene que ser trabajo tuyo, que entiendes y puedes defender ante el tribunal.</p>
+        <p>Tres reglas resumen todo el apartado: <b>tú eres responsable de cada frase y cada dato</b>, <b>declaras lo que has usado</b> y <b>nunca introduces datos personales</b>. Tu centro puede tener normas propias sobre la IA: consúltalas con tu tutora, porque prevalecen sobre esta guía.</p>
+      </div>
+
+      <div class="light">
+        <div><h3><span class="dot d-g"></span>Uso adecuado</h3><ul class="tight">
+          <li>Generar ideas de temas para comentarlas con la tutora.</li>
+          <li>Pedir que te explique un concepto que no entiendes y contrastarlo con fuentes oficiales.</li>
+          <li>Proponer sinónimos y descriptores para la ecuación de búsqueda.</li>
+          <li>Revisar ortografía y claridad de un texto escrito por ti.</li>
+          <li>Ayudar a traducir el resumen al inglés, revisándolo después.</li>
+        </ul></div>
+        <div><h3><span class="dot d-a"></span>Con precaución</h3><ul class="tight">
+          <li>Resúmenes de artículos: te ayudan a entenderlos, pero tienes que leer el original antes de citarlo.</li>
+          <li>Propuestas de estructura de un procedimiento, una ficha o un cuestionario: adáptalas tú y que las revise la tutora.</li>
+          <li>Datos, cifras o normativa: la IA se equivoca con frecuencia. Verifícalos siempre en la fuente.</li>
+        </ul></div>
+        <div><h3><span class="dot d-r"></span>No permitido</h3><ul class="tight">
+          <li>Entregar textos generados por la IA como si fueran tuyos.</li>
+          <li>Copiar referencias bibliográficas que te da la IA sin comprobar que existen.</li>
+          <li>Introducir datos de pacientes, informes clínicos reales o información confidencial del centro.</li>
+          <li>Inventar resultados, encuestas o datos.</li>
+          <li>Citar a la IA como fuente de información clínica o científica.</li>
+        </ul></div>
+      </div>
+
+      <h3>Los riesgos que debes conocer</h3>
+      <details class="acc"><summary>Alucinaciones y referencias inventadas</summary><div class="acc-b">
+        <p>Los modelos de lenguaje generan texto verosímil, no necesariamente verdadero. Pueden inventar artículos con autores, revista y DOI que parecen reales. Antes de usar cualquier referencia, búscala en PubMed, Dialnet o en la web de la revista y abre el documento. Si no lo encuentras, no existe.</p>
+      </div></details>
+      <details class="acc"><summary>Datos personales y confidencialidad</summary><div class="acc-b">
+        <p>Lo que escribes en una herramienta de IA puede almacenarse en servidores externos. Introducir datos de salud de pacientes, aunque sea un informe de alta «de prueba» copiado de las prácticas, vulnera el Reglamento General de Protección de Datos y la Ley Orgánica 3/2018. En Documentación Sanitaria y en emergencias esto es especialmente grave: trabajas con historias clínicas, registros de llamadas y datos de personas afectadas.</p>
+        <p>Si necesitas un caso para practicar, usa uno inventado por completo o los casos simulados que te facilite el profesorado.</p>
+      </div></details>
+      <details class="acc"><summary>Normativa desactualizada o de otro país</summary><div class="acc-b">
+        <p>La IA mezcla con facilidad normativa de distintos países o versiones antiguas: por ejemplo, reglas de la CIE-10-CM estadounidense con la CIE-10-ES española, o planes de emergencia de otra comunidad autónoma. Toda la normativa se comprueba en el BOE, en el boletín de tu comunidad o en el Ministerio de Sanidad.</p>
+      </div></details>
+      <details class="acc"><summary>Pérdida de aprendizaje y defensa oral</summary><div class="acc-b">
+        <p>Si la IA hace el trabajo por ti, no podrás responder a las preguntas del tribunal. Una buena prueba: ¿podrías explicar con tus palabras cada párrafo de tu memoria sin mirarlo?</p>
+      </div></details>
+
+      <h3>¿Uso adecuado o no? Pon a prueba tu criterio</h3>
+      <div class="scen" id="scen"></div>
+      <p class="q-meta" id="scenScore"></p>
+
+      <h3>Cómo pedirle algo útil a la IA</h3>
+      <div class="grid2">
+        <div class="note warn"><b>Petición pobre</b><p class="ref" style="margin-top:8px;padding-left:12px;text-indent:0">Hazme la introducción de un proyecto sobre codificación.</p><p style="margin-top:6px;font-size:.9rem">Pide el trabajo hecho, no da contexto y el resultado no sería tuyo.</p></div>
+        <div class="note ok"><b>Petición útil</b><p class="ref" style="margin-top:8px;padding-left:12px;text-indent:0">Soy estudiante de TS en Documentación y Administración Sanitarias. Estoy preparando una búsqueda bibliográfica sobre errores en la codificación con CIE-10-ES. Sugiéreme sinónimos en inglés y en español para «exactitud de la codificación» y explícame la diferencia entre un descriptor MeSH y un término en texto libre. No me des referencias bibliográficas.</p><p style="margin-top:6px;font-size:.9rem">Da contexto, pide ayuda para una tarea concreta y deja el trabajo intelectual en tus manos.</p></div>
+      </div>
+
+      <h3>Cómo declarar y citar el uso de la IA</h3>
+      <div class="prose">
+        <p>Si has usado IA, inclúyelo en la memoria: en la metodología o en un apartado breve de «Declaración de uso de inteligencia artificial» antes de las referencias. Indica la herramienta, para qué la usaste y cómo revisaste el resultado.</p>
+        <p>Si citas un texto generado por la IA, APA 7 propone tratar la herramienta como software: el autor es la empresa que la desarrolla, y en el texto o en un anexo se explica qué se le preguntó.</p>
+      </div>
+      <p class="ref">Empresa desarrolladora. (Año de la versión). <i>Nombre de la herramienta</i> (versión) [Modelo de lenguaje de gran tamaño]. URL</p>
+      <p class="ref">OpenAI. (2023). <i>ChatGPT</i> (versión del 14 de marzo) [Modelo de lenguaje de gran tamaño]. https://chat.openai.com/chat</p>
+      <p style="font-size:.93rem">En el texto: <span class="mono">(OpenAI, 2023)</span>. La IA nunca figura como autora del proyecto ni sustituye a las fuentes científicas: si te da un dato, cita el artículo o la norma donde lo has comprobado.</p>
+
+      <div class="card" style="display:grid;gap:12px">
+        <h3>Genera tu declaración</h3>
+        <div class="row2">
+          <div class="field"><label for="dTool">Herramienta</label><input id="dTool" value="ChatGPT (OpenAI)"></div>
+          <div class="field"><label for="dDate">Periodo de uso</label><input id="dDate" value="octubre de 2026 a marzo de 2027"></div>
+        </div>
+        <div class="decl-uses" id="dUses"></div>
+        <p class="ref" id="dOut" style="padding-left:12px;text-indent:0;line-height:1.75"></p>
+        <div class="btns"><button class="btn primary" id="dCopy">Copiar declaración</button><span class="copy-ok" id="dOk" aria-live="polite"></span></div>
+      </div>
+    </section>
+
+    <!-- FORMATO APA -->
+    <section id="formato" aria-labelledby="h-fmt">
+      <p class="eyebrow">Normas APA 7</p>
+      <h2 id="h-fmt">Formato del documento</h2>
+      <div class="prose"><p>APA 7.ª edición (American Psychological Association, 2020) es el estilo más usado en ciencias de la salud en español. Si tu centro tiene su propia plantilla, manda la plantilla; estas son las pautas de APA para trabajos de estudiantes.</p></div>
+      <div class="tbl"><table>
+        <thead><tr><th>Elemento</th><th>Norma APA 7</th></tr></thead>
+        <tbody>
+          <tr><td>Fuente</td><td>Legible y coherente en todo el texto: Calibri 11, Arial 11, Georgia 11 o Times New Roman 12.</td></tr>
+          <tr><td>Interlineado</td><td>Doble en todo el documento (muchas guías de FP admiten 1,5: consulta la tuya).</td></tr>
+          <tr><td>Márgenes</td><td>2,54 cm en los cuatro lados.</td></tr>
+          <tr><td>Párrafos</td><td>Sangría de 1,27 cm en la primera línea; alineación a la izquierda.</td></tr>
+          <tr><td>Paginación</td><td>Número de página en la esquina superior derecha, desde la portada.</td></tr>
+          <tr><td>Lista de referencias</td><td>Página nueva, título «Referencias» centrado y en negrita, orden alfabético, sangría francesa de 1,27 cm.</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Niveles de título</h3>
+      <div class="card" style="display:grid;gap:8px">
+        <p style="text-align:center;font-weight:700">Nivel 1: centrado, negrita</p>
+        <p style="font-weight:700">Nivel 2: alineado a la izquierda, negrita</p>
+        <p style="font-weight:700;font-style:italic">Nivel 3: alineado a la izquierda, negrita y cursiva</p>
+        <p style="padding-left:1.27cm;font-weight:700">Nivel 4: con sangría, negrita, terminado en punto. <span style="font-weight:400">El texto sigue en la misma línea.</span></p>
+        <p style="padding-left:1.27cm;font-weight:700;font-style:italic">Nivel 5: con sangría, negrita y cursiva, terminado en punto. <span style="font-weight:400;font-style:normal">El texto sigue en la misma línea.</span></p>
+      </div>
+      <details class="acc"><summary>Tablas y figuras</summary><div class="acc-b">
+        <p>Se numeran por separado (Tabla 1, Tabla 2… / Figura 1, Figura 2…) en el orden en que se mencionan en el texto.</p>
+        <p><b>Encima</b> de la tabla o figura: el número en negrita (<b>Tabla 1</b>) y, en la línea siguiente, el título en cursiva.</p>
+        <p><b>Debajo</b>: la <i>Nota.</i> con la explicación y la fuente si la has adaptado: <span class="mono">Nota. Adaptado de García y Ruiz (2024).</span></p>
+        <p>Las tablas APA no llevan líneas verticales y usan solo las horizontales imprescindibles.</p>
+      </div></details>
+      <details class="acc"><summary>Abreviaturas, números y lenguaje</summary><div class="acc-b">
+        <p>Define cada sigla la primera vez: «Conjunto Mínimo Básico de Datos (CMBD)». Después, usa solo la sigla.</p>
+        <p>Escribe con letra los números del cero al nueve y con cifra a partir del 10, salvo medidas, porcentajes, edades y estadísticos (5 mg, 3 %, 8 años).</p>
+        <p>Usa lenguaje centrado en la persona: «pacientes con diabetes» mejor que «diabéticos».</p>
+      </div></details>
+    </section>
+
+    <!-- CITAS -->
+    <section id="citas" aria-labelledby="h-citas">
+      <p class="eyebrow">Normas APA 7</p>
+      <h2 id="h-citas">Citas en el texto</h2>
+      <div class="prose"><p>Cada cita en el texto remite a una entrada de la lista de referencias, y cada entrada de la lista aparece citada al menos una vez. APA usa el sistema <strong>autor-fecha</strong>.</p></div>
+      <div class="grid2">
+        <div class="card"><h3>Cita parentética</h3><p style="margin-top:6px;color:var(--muted)">Autor y año entre paréntesis, al final de la idea.</p><p class="ref" style="margin-top:10px">La auditoría periódica mejora la exactitud de la codificación (García y Ruiz, 2024).</p></div>
+        <div class="card"><h3>Cita narrativa</h3><p style="margin-top:6px;color:var(--muted)">El autor forma parte de la frase y el año va entre paréntesis.</p><p class="ref" style="margin-top:10px">García y Ruiz (2024) señalan que la auditoría periódica mejora la exactitud de la codificación.</p></div>
+      </div>
+      <div class="tbl"><table>
+        <thead><tr><th>Número de autores</th><th>Parentética</th><th>Narrativa</th></tr></thead>
+        <tbody>
+          <tr><td>Uno</td><td class="mono">(Martín, 2023)</td><td class="mono">Martín (2023)</td></tr>
+          <tr><td>Dos</td><td class="mono">(Martín y Soto, 2023)</td><td class="mono">Martín y Soto (2023)</td></tr>
+          <tr><td>Tres o más</td><td class="mono">(Martín et al., 2023)</td><td class="mono">Martín et al. (2023)</td></tr>
+          <tr><td>Autor institucional</td><td class="mono">(Organización Mundial de la Salud [OMS], 2022) → después (OMS, 2022)</td><td class="mono">Organización Mundial de la Salud (OMS, 2022)</td></tr>
+          <tr><td>Sin fecha</td><td class="mono">(Martín, s. f.)</td><td class="mono">Martín (s. f.)</td></tr>
+          <tr><td>Varias obras</td><td class="mono">(López, 2021; Martín, 2023)</td><td class="mono">—</td></tr>
+        </tbody>
+      </table></div>
+      <details class="acc"><summary>Citas textuales (copiar palabras exactas)</summary><div class="acc-b">
+        <p><b>Menos de 40 palabras:</b> entre comillas, dentro del párrafo, con número de página: <span class="mono">(Martín, 2023, p. 14)</span>.</p>
+        <p><b>40 palabras o más:</b> en bloque aparte, con sangría de 1,27 cm, sin comillas, y la cita detrás del punto final.</p>
+        <p>En un proyecto de FP, úsalas poco. Parafrasear (explicar con tus palabras y citar) demuestra que has entendido la fuente.</p>
+      </div></details>
+      <div class="note warn"><b>Plagio:</b> copiar un texto, una tabla o una imagen sin citar es plagio aunque cambies alguna palabra. Las herramientas de detección también comparan paráfrasis muy cercanas al original.</div>
+    </section>
+
+    <!-- REFERENCIAS -->
+    <section id="referencias" aria-labelledby="h-ref">
+      <p class="eyebrow">Normas APA 7</p>
+      <h2 id="h-ref">Lista de referencias</h2>
+      <div class="prose"><p>Toda referencia responde a cuatro preguntas: <span class="k1" style="padding:0 5px;border-radius:4px;font-weight:600">quién</span>, <span class="k2" style="padding:0 5px;border-radius:4px;font-weight:600">cuándo</span>, <span class="k3" style="padding:0 5px;border-radius:4px;font-weight:600">qué</span> y <span class="k4" style="padding:0 5px;border-radius:4px;font-weight:600">dónde</span>. Los ejemplos de autores particulares son ficticios; los de legislación y del manual APA son reales.</p></div>
+      <div class="tabs" role="tablist" aria-label="Tipos de referencia" id="refTabs">
+        <button role="tab" aria-selected="true" data-t="r1">Artículo</button>
+        <button role="tab" aria-selected="false" data-t="r2">Libro</button>
+        <button role="tab" aria-selected="false" data-t="r3">Capítulo</button>
+        <button role="tab" aria-selected="false" data-t="r4">Página web</button>
+        <button role="tab" aria-selected="false" data-t="r5">Legislación</button>
+        <button role="tab" aria-selected="false" data-t="r6">Guía institucional</button>
+      </div>
+      <div class="tabpanel" id="r1" role="tabpanel">
+        <p class="ref"><span class="k1">García, M. y Ruiz, L.</span> <span class="k2">(2024).</span> <span class="k3">Auditoría de la codificación clínica con CIE-10-ES en un hospital comarcal.</span> <span class="k4"><i>Revista de Documentación Clínica</i>, <i>12</i>(3), 45–58. https://doi.org/10.xxxx/rdc.2024.123</span></p>
+        <div class="anat" style="margin-top:10px"><p>Nombre de la revista y número de volumen en cursiva; el número del fascículo entre paréntesis, sin cursiva. Si tiene DOI, siempre como enlace https://doi.org/…</p></div>
+      </div>
+      <div class="tabpanel" id="r2" role="tabpanel" hidden>
+        <p class="ref"><span class="k1">Martín, A.</span> <span class="k2">(2023).</span> <span class="k3"><i>Gestión de la información en emergencias sanitarias</i> (2.ª ed.).</span> <span class="k4">Editorial Ejemplo.</span></p>
+        <div class="anat" style="margin-top:10px"><p>El título del libro va en cursiva. La edición se indica solo a partir de la segunda. APA 7 ya no incluye la ciudad de la editorial.</p></div>
+      </div>
+      <div class="tabpanel" id="r3" role="tabpanel" hidden>
+        <p class="ref"><span class="k1">Soto, P.</span> <span class="k2">(2022).</span> <span class="k3">El archivo de historias clínicas.</span> <span class="k4">En R. Vidal (Ed.), <i>Manual de documentación sanitaria</i> (pp. 33–52). Editorial Ejemplo.</span></p>
+        <div class="anat" style="margin-top:10px"><p>Va en cursiva el libro, no el capítulo. Los editores llevan la inicial delante del apellido.</p></div>
+      </div>
+      <div class="tabpanel" id="r4" role="tabpanel" hidden>
+        <p class="ref"><span class="k1">Organización Mundial de la Salud.</span> <span class="k2">(2023, 10 de marzo).</span> <span class="k3"><i>Título de la página consultada</i>.</span> <span class="k4">https://www.who.int/es/…</span></p>
+        <div class="anat" style="margin-top:10px"><p>Si el autor coincide con el nombre del sitio web, no se repite el sitio. Si el contenido cambia con frecuencia, añade la fecha de consulta: <span class="mono">Recuperado el 6 de octubre de 2026, de https://…</span></p></div>
+      </div>
+      <div class="tabpanel" id="r5" role="tabpanel" hidden>
+        <p class="ref"><span class="k3">Ley 41/2002, de 14 de noviembre, básica reguladora de la autonomía del paciente y de derechos y obligaciones en materia de información y documentación clínica.</span> <span class="k4"><i>Boletín Oficial del Estado</i>, 274, de 15 de noviembre de 2002.</span> https://www.boe.es/eli/es/l/2002/11/14/41/con</p>
+        <p class="ref" style="margin-top:8px">Ley Orgánica 3/2022, de 31 de marzo, de ordenación e integración de la Formación Profesional. <i>Boletín Oficial del Estado</i>, 78, de 1 de abril de 2022. https://www.boe.es/eli/es/lo/2022/03/31/3/con</p>
+        <div class="anat" style="margin-top:10px"><p>APA no fija un formato para la legislación española; esta es la adaptación más extendida. En el texto: <span class="mono">(Ley 41/2002)</span>. Enlaza la versión consolidada del BOE.</p></div>
+      </div>
+      <div class="tabpanel" id="r6" role="tabpanel" hidden>
+        <p class="ref"><span class="k1">Ministerio de Sanidad.</span> <span class="k2">(2024).</span> <span class="k3"><i>Título de la guía o del informe</i>.</span> <span class="k4">https://www.sanidad.gob.es/…</span></p>
+        <div class="anat" style="margin-top:10px"><p>Cuando el autor es una institución, su nombre completo ocupa el lugar del autor. Si el documento tiene número de informe, va entre paréntesis después del título.</p></div>
+      </div>
+      <details class="acc"><summary>Reglas que más se olvidan</summary><div class="acc-b">
+        <ul class="tight">
+          <li>Hasta 20 autores se escriben todos. Con 21 o más: los 19 primeros, puntos suspensivos y el último.</li>
+          <li>Solo la primera palabra del título del artículo (y los nombres propios) en mayúscula.</li>
+          <li>Mismo autor y año: añade a, b, c después del año (2023a, 2023b).</li>
+          <li>Nada de «Recuperado de» delante del DOI, y sin punto final después de una URL.</li>
+          <li>En las adaptaciones al español se usa «y» entre autores; algunos centros mantienen «&». Elige uno y sé coherente.</li>
+        </ul>
+      </div></details>
+    </section>
+
+    <!-- GENERADOR -->
+    <section id="generador" aria-labelledby="h-gen">
+      <p class="eyebrow">Normas APA 7</p>
+      <h2 id="h-gen">Generador de referencias</h2>
+      <p class="lead">Rellena los campos y obtén la referencia, la cita parentética y la cita narrativa. Revisa siempre el resultado con la fuente original.</p>
+      <div class="card builder">
+        <div class="fields">
+          <div class="field"><label for="gType">Tipo de fuente</label>
+            <select id="gType"><option value="art">Artículo de revista</option><option value="book">Libro</option><option value="chap">Capítulo de libro</option><option value="web">Página web</option></select></div>
+          <div class="field"><label for="gAuth">Autores (uno por línea: Apellido, Iniciales)</label><textarea id="gAuth">García, M.
+Ruiz, L.
+Pérez, A.</textarea></div>
+          <div class="row2">
+            <div class="field"><label for="gYear">Año</label><input id="gYear" value="2024"></div>
+            <div class="field" data-for="art"><label for="gVol">Volumen</label><input id="gVol" value="12"></div>
+            <div class="field" data-for="book chap web" hidden><label for="gEd">Edición (2.ª, 3.ª…)</label><input id="gEd" placeholder="Vacío si es la 1.ª"></div>
+          </div>
+          <div class="field"><label for="gTitle">Título</label><input id="gTitle" value="Auditoría de la codificación clínica con CIE-10-ES en un hospital comarcal"></div>
+          <div class="field" data-for="art"><label for="gSrc">Revista</label><input id="gSrc" value="Revista de Documentación Clínica"></div>
+          <div class="field" data-for="chap" hidden><label for="gBook">Título del libro y editores (p. ej.: R. Vidal (Ed.), Título del libro)</label><input id="gBook" placeholder="R. Vidal (Ed.), Manual de documentación sanitaria"></div>
+          <div class="row2" data-for="art chap">
+            <div class="field" data-for="art"><label for="gNum">Número</label><input id="gNum" value="3"></div>
+            <div class="field"><label for="gPag">Páginas</label><input id="gPag" value="45–58"></div>
+          </div>
+          <div class="field" data-for="book chap web" hidden><label for="gPub">Editorial o sitio web</label><input id="gPub"></div>
+          <div class="field"><label for="gLink">DOI o URL</label><input id="gLink" value="https://doi.org/10.xxxx/rdc.2024.123"></div>
+        </div>
+        <div class="out">
+          <h4>Referencia</h4>
+          <p class="ref" id="gRef"></p>
+          <h4>Cita parentética</h4>
+          <p class="ref" id="gPar"></p>
+          <h4>Cita narrativa</h4>
+          <p class="ref" id="gNar"></p>
+          <div class="btns"><button class="btn primary" id="gCopy">Copiar referencia</button></div>
+          <p class="copy-ok" id="gCopyOk" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- GLOSARIO -->
+    <section id="glosario" aria-labelledby="h-glo">
+      <p class="eyebrow">Repaso</p>
+      <h2 id="h-glo">Glosario</h2>
+      <p class="lead">Pulsa cada tarjeta para ver la definición.</p>
+      <div class="flips" id="flips"></div>
+    </section>
+
+    <!-- TEST -->
+    <section id="test" aria-labelledby="h-test">
+      <p class="eyebrow">Repaso</p>
+      <h2 id="h-test">Autoevaluación</h2>
+      <div class="card q" id="quiz"></div>
+    </section>
+
+    <!-- CHECKLIST -->
+    <section id="checklist" aria-labelledby="h-chk">
+      <p class="eyebrow">Repaso</p>
+      <h2 id="h-chk">Lista de comprobación antes de entregar</h2>
+      <div class="card" style="display:grid;gap:12px">
+        <div class="q-meta"><span id="chkTxt">0 de 0</span><span>Se guarda en este navegador</span></div>
+        <div class="meter"><i id="chkBar"></i></div>
+        <div class="check" id="chk"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <div class="foot-in">
+    <a class="brand" href="https://sanidadedtech.es" target="_blank" rel="noopener"><img class="logo" src="data:image/png;base64,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" alt="SanidadEdTech"></a>
+    <div class="foot-txt">
+      <p>Recurso educativo diseñado para el alumnado de <strong>Formación Profesional de Grado Superior</strong> de las familias profesionales de <strong>Sanidad</strong> y <strong>Seguridad y Medio Ambiente</strong>, por <strong>V. López</strong> (<a href="https://sanidadedtech.es" target="_blank" rel="noopener">@sanidadedtech</a>).</p>
+      <div class="cc"><span class="cc-badge" aria-hidden="true"><span>CC</span><span>BY</span><span>NC</span><span>SA</span></span>
+        <span>Licencia <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" target="_blank" rel="noopener">Creative Commons Reconocimiento-NoComercial-CompartirIgual 4.0 Internacional</a>.</span></div>
+      <p>Puedes compartir y adaptar este recurso citando la autoría. No se permite su uso comercial ni su venta. Las obras derivadas deben compartirse con esta misma licencia.</p>
+      <p>Normas de citación basadas en APA 7.ª ed. (2020).</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- Progreso y scrollspy ---------- */
+const bar=$("#progress"), links=$$("#toc a"), secs=links.map(a=>document.querySelector(a.getAttribute("href")));
+function onScroll(){
+  const h=document.documentElement, max=h.scrollHeight-h.clientHeight;
+  bar.style.width=(max>0?h.scrollTop/max*100:0)+"%";
+  let cur=0; secs.forEach((s,i)=>{ if(s && s.getBoundingClientRect().top<140) cur=i; });
+  links.forEach((a,i)=>a.classList.toggle("on",i===cur));
+}
+addEventListener("scroll",onScroll,{passive:true}); onScroll();
+
+/* ---------- Tabs ---------- */
+function tabs(id){
+  const btns=$$("#"+id+" button");
+  btns.forEach(b=>b.addEventListener("click",()=>{
+    btns.forEach(x=>{x.setAttribute("aria-selected",x===b);document.getElementById(x.dataset.t).hidden=x!==b;});
+  }));
+}
+tabs("temaTabs"); tabs("refTabs"); tabs("metTabs");
+$$("#metPicker button").forEach(b=>b.addEventListener("click",()=>{
+  const t=$$("#metTabs button").find(x=>x.dataset.t===b.dataset.t); t.click();
+  $("#metTabs").scrollIntoView({behavior:"smooth",block:"start"});
+}));
+
+/* ---------- Constructor de ecuaciones ---------- */
+const blocks=[
+ ["Codificación",[['"Clinical Coding"[Mesh]',1],['"clinical coding"[tiab]',1],['"medical coding"[tiab]',1],['"coding accuracy"[tiab]',0]]],
+ ["Clasificación",[['"International Classification of Diseases"[Mesh]',1],['"ICD-10"[tiab]',1],['"ICD-10-CM"[tiab]',0],['"ICD-10-PCS"[tiab]',0]]],
+ ["Exactitud y efectos",[['"Data Accuracy"[Mesh]',1],['"coding errors"[tiab]',1],['"Diagnosis-Related Groups"[Mesh]',0],['"Medical Audit"[Mesh]',0]]]
+];
+$("#qb").innerHTML=blocks.map(([n,ts],bi)=>`<fieldset><legend>Bloque ${bi+1}: ${n}</legend>${ts.map(([t,on],ti)=>`<label><input type="checkbox" id="qb${bi}_${ti}" ${on?"checked":""}><span>${esc(t)}</span></label>`).join("")}</fieldset>`).join("");
+function buildQ(html){
+  const op=o=>html?`<span class="op">${o}</span>`:o, e=html?esc:(s=>s);
+  const parts=blocks.map(([n,ts],bi)=>ts.filter((_,ti)=>$(`#qb${bi}_${ti}`).checked).map(([t])=>e(t))).filter(a=>a.length);
+  if(!parts.length) return "";
+  let q=parts.map(a=>a.length>1?"("+a.join(` ${op("OR")} `)+")":a[0]).join(` ${op("AND")} `);
+  const y=parseInt($("#qbFrom").value,10);
+  if(y>=1990&&y<=2026) q+=` ${op("AND")} ${y}:2026[dp]`;
+  const l=$("#qbLang").value;
+  if(l==="es-en") q+=` ${op("AND")} (english[la] ${op("OR")} spanish[la])`;
+  if(l==="en") q+=` ${op("AND")} english[la]`;
+  return q;
+}
+function renderQb(){ const q=buildQ(true); $("#qbOut").innerHTML=q||"Marca al menos un término."; }
+$$("#qb input, #qbFrom, #qbLang").forEach(el=>el.addEventListener("input",renderQb)); renderQb();
+$("#qbCopy").addEventListener("click",()=>{
+  const ok=$("#qbOk"), sel=()=>{const r=document.createRange();r.selectNodeContents($("#qbOut"));const s=getSelection();s.removeAllRanges();s.addRange(r);ok.textContent="Seleccionada: cópiala con Ctrl+C.";};
+  try{navigator.clipboard.writeText(buildQ(false)).then(()=>ok.textContent="Copiada. Pégala en el buscador de PubMed.",sel);}catch(e){sel();}
+});
+
+/* ---------- IA: escenarios ---------- */
+const scen=[
+ ["Pides a la IA diez ideas de temas sobre gestión de la documentación clínica para elegir una y llevarla a la tutora.","g","Uso adecuado: la IA te ayuda a explorar, pero el tema lo eliges tú y lo valida la tutora."],
+ ["Copias en la IA un informe de alta de tus prácticas, quitando solo el nombre, para que te sugiera los códigos CIE-10-ES.","r","No permitido: un informe con fechas, edad, servicio y diagnósticos sigue siendo un dato de salud identificable. Usa casos inventados."],
+ ["Le pides que te explique la diferencia entre diagnóstico principal y diagnósticos secundarios en la CIE-10-ES.","a","Con precaución: puede ayudarte a entenderlo, pero compruébalo en el manual oficial de codificación del Ministerio de Sanidad, porque puede mezclar normas de otros países."],
+ ["Pides a la IA cinco artículos sobre errores de codificación y pegas sus referencias en tu lista.","r","No permitido: la IA puede inventar artículos que parecen reales. Cada referencia debe estar localizada y leída por ti."],
+ ["Escribes tú la introducción y pides a la IA que revise la ortografía y señale frases poco claras.","g","Uso adecuado: el texto es tuyo y la IA actúa como corrector. Indícalo en la declaración de uso."],
+ ["Pides a la IA que redacte el apartado de conclusiones a partir de tus resultados y lo entregas tal cual.","r","No permitido: las conclusiones son tu interpretación. Entregar un texto generado como propio es una falta de integridad académica."],
+ ["Pides a la IA una propuesta de estructura para un procedimiento de préstamo de historias clínicas y la adaptas a tu archivo con la tutora.","a","Con precaución: es un punto de partida razonable si lo adaptas, lo revisas con la tutora y lo declaras."],
+ ["Usas la IA para traducir al inglés el resumen que has escrito y después revisas la terminología.","g","Uso adecuado, siempre que revises el resultado y compruebes los términos técnicos."]
+];
+const lab={g:["Adecuado","d-g"],a:["Con precaución","d-a"],r:["No permitido","d-r"]};
+let sDone=0,sOk=0;
+$("#scen").innerHTML=scen.map(([t],i)=>`<div class="scen-item"><p>${esc(t)}</p><div class="scen-btns" data-i="${i}">${Object.entries(lab).map(([k,[l,c]])=>`<button data-k="${k}"><span class="dot ${c}"></span>${l}</button>`).join("")}</div><div class="scen-fb" aria-live="polite"></div></div>`).join("");
+$$("#scen .scen-btns").forEach(box=>box.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
+  const i=+box.dataset.i,[,k,fb]=scen[i],ok=b.dataset.k===k;
+  box.querySelectorAll("button").forEach(x=>{x.disabled=true;if(x.dataset.k===k)x.classList.add("pick");});
+  sDone++; if(ok)sOk++;
+  box.nextElementSibling.innerHTML=`<div class="note ${ok?"ok":"warn"}"><b>${ok?"Correcto.":"No exactamente."}</b> ${esc(fb)}</div>`;
+  $("#scenScore").textContent=`${sOk} de ${sDone} acertados${sDone===scen.length?" · has completado todos los casos":""}`;
+})));
+
+/* ---------- IA: declaración ---------- */
+const uses=[["buscar ideas para el tema del proyecto",1],["identificar sinónimos y descriptores para la búsqueda bibliográfica",1],["aclarar conceptos, que después contrasté con fuentes oficiales",0],["revisar la ortografía y la claridad de textos escritos por mí",1],["traducir el resumen al inglés",0],["proponer una estructura inicial para documentos que después adapté",0]];
+$("#dUses").innerHTML=uses.map(([u,on],i)=>`<label><input type="checkbox" id="du${i}" ${on?"checked":""}><span>${esc(u)}</span></label>`).join("");
+function decl(){
+  const sel=uses.filter((_,i)=>$("#du"+i).checked).map(u=>u[0]);
+  const tool=$("#dTool").value.trim()||"[herramienta]", per=$("#dDate").value.trim()||"[periodo]";
+  let list=sel.length===0?"[marca al menos un uso]":sel.length===1?sel[0]:sel.slice(0,-1).join(", ")+" y "+sel[sel.length-1];
+  $("#dOut").textContent=`Durante la elaboración de este proyecto se utilizó la herramienta de inteligencia artificial ${tool}, entre ${per}, para ${list}. Todo el contenido fue revisado, verificado y redactado por la autora o el autor, que asume la responsabilidad del trabajo. No se introdujeron datos personales ni información confidencial, y ninguna referencia bibliográfica procede de la herramienta sin haber sido localizada y consultada en su fuente original.`;
+}
+$$("#dUses input, #dTool, #dDate").forEach(el=>el.addEventListener("input",decl)); decl();
+$("#dCopy").addEventListener("click",()=>{
+  const ok=$("#dOk"),sel=()=>{const r=document.createRange();r.selectNodeContents($("#dOut"));const s=getSelection();s.removeAllRanges();s.addRange(r);ok.textContent="Seleccionada: cópiala con Ctrl+C.";};
+  try{navigator.clipboard.writeText($("#dOut").textContent).then(()=>ok.textContent="Copiada.",sel);}catch(e){sel();}
+});
+
+/* ---------- Diagrama PRISMA ---------- */
+function prisma(){
+  const n=id=>Math.max(0,parseInt($("#"+id).value,10)||0);
+  const P=n("pP"),S=n("pS"),B=n("pB"),D=n("pD"),dup=n("pDup"),t=n("pT"),na=n("pNA"),f=n("pF");
+  const ident=P+S+B+D, cribados=ident-dup, textoC=cribados-t, evaluados=textoC-na, incl=evaluados-f;
+  const err=$("#pErr");
+  if(cribados<0||textoC<0||evaluados<0||incl<0){err.textContent="Las exclusiones superan los registros disponibles en alguna fase. Revisa las cifras.";$("#prisma").innerHTML="";return;}
+  err.textContent="";
+  $("#prisma").innerHTML=`
+   <p class="plabel">Identificación</p>
+   <div class="pbox">Registros identificados en bases de datos: <b>${ident}</b><br><small>PubMed ${P} · Scopus ${S} · BVS/SciELO ${B} · Dialnet ${D}</small></div>
+   <div class="pbox ex">Duplicados eliminados: <b>${dup}</b></div>
+   <p class="plabel">Cribado</p>
+   <div class="pbox">Registros cribados por título y resumen: <b>${cribados}</b></div>
+   <div class="pbox ex">Excluidos: <b>${t}</b></div>
+   <div class="pbox">Artículos buscados a texto completo: <b>${textoC}</b></div>
+   <div class="pbox ex">No disponibles: <b>${na}</b></div>
+   <div class="pbox">Artículos evaluados a texto completo: <b>${evaluados}</b></div>
+   <div class="pbox ex">Excluidos por no cumplir criterios: <b>${f}</b></div>
+   <p class="plabel">Incluidos</p>
+   <div class="pbox fin">Artículos incluidos en la revisión: <b>${incl}</b></div><div></div>`;
+}
+$$(".pin input[id^='p']").forEach(el=>el.addEventListener("input",prisma)); prisma();
+
+/* ---------- Fases con puerta de validación ---------- */
+const phases=[
+ {n:"Fase 1",t:"Elección del tema",body:`<p>El alumnado propone el tema. Se entrega una <b>ficha de propuesta</b> breve (una página) con:</p>
+  <ul class="tight"><li>Título provisional delimitado.</li><li>Justificación: qué problema o necesidad aborda.</li><li>Módulos del ciclo que intervienen.</li><li>Objetivo general provisional.</li><li>Tipo de proyecto y producto final previsto.</li><li>Tres o cuatro fuentes iniciales en APA.</li></ul>
+  <p>Puedes presentar hasta dos alternativas por orden de preferencia.</p>`},
+ {n:"Fase 2",t:"Validación de la tutora",gate:true,body:`<p>La tutora revisa la propuesta con los criterios de pertinencia, carácter intermodular, viabilidad, delimitación, fundamentación y ética. El resultado puede ser:</p>
+  <div class="grid3"><div class="note ok"><b>Validado</b><br>Se pasa a la fase 3.</div><div class="note warn"><b>Validado con modificaciones</b><br>Se incorporan los cambios indicados y se pasa a la fase 3.</div><div class="note" style="border-color:var(--brand);background:var(--brand-soft)"><b>No validado</b><br>Se reformula la propuesta y se vuelve a la fase 1.</div></div>
+  <p><b>Simula la decisión:</b></p>
+  <div class="btns"><button class="btn" data-v="ok">Validado</button><button class="btn" data-v="mod">Con modificaciones</button><button class="btn" data-v="no">No validado</button></div>`},
+ {n:"Fase 3",t:"Planificación",body:`<p>Con el tema validado se elabora el <b>anteproyecto</b>: objetivos definitivos, metodología, recursos necesarios y calendario de trabajo. Es el momento de hacer la búsqueda bibliográfica sistemática (bases de datos como PubMed, SciELO, Dialnet, Cochrane Library; fuentes oficiales como BOE o Ministerio de Sanidad).</p>`},
+ {n:"Fase 4",t:"Desarrollo",body:`<p>Se ejecuta lo planificado: se diseña el producto (guía, protocolo, plan, recurso), se recogen y analizan datos si los hay, y se mantienen <b>tutorías de seguimiento</b> periódicas. Conviene llevar un diario de proyecto con decisiones y fuentes.</p>`},
+ {n:"Fase 5",t:"Redacción",body:`<p>Se redacta la memoria con todos los apartados y las normas APA 7. Entrega un borrador a la tutora con tiempo suficiente para incorporar correcciones. Revisa ortografía, coherencia entre objetivos y resultados, y que todas las citas estén en la lista de referencias.</p>`},
+ {n:"Fase 6",t:"Entrega y defensa",body:`<p>Entrega de la memoria definitiva en la fecha fijada y <b>defensa oral</b> (habitualmente 10–20 minutos más preguntas). Prepara una presentación con pocas palabras por diapositiva: problema, objetivos, metodología, producto, conclusiones.</p>`}
+];
+let cur=0, validated=null; // null=pendiente, ok, mod, no
+function phState(i){
+  if(i<=1) return "open";
+  return (validated==="ok"||validated==="mod")?"open":"locked";
+}
+function renderPhases(){
+  $("#phases").innerHTML=phases.map((p,i)=>{
+    const st=phState(i), cls=["ph",i===cur?"cur":"",st==="locked"?"locked":"",p.gate?"gate":"",(i<cur&&st==="open")?"done":""].join(" ");
+    return `<button class="${cls}" role="tab" aria-selected="${i===cur}" data-i="${i}" ${st==="locked"?'aria-disabled="true"':""}><small>${p.n}${st==="locked"?" · bloqueada":""}</small><b>${p.t}</b></button>`;
+  }).join("");
+  const p=phases[cur];
+  let badge="";
+  if(p.gate){
+    badge = validated==="ok"?`<span class="status st-ok">Tema validado</span>`:
+            validated==="mod"?`<span class="status st-warn">Validado con modificaciones</span>`:
+            validated==="no"?`<span class="status st-bad">No validado: reformular</span>`:`<span class="status st-lock">Pendiente de validación</span>`;
+  }
+  const next = cur<phases.length-1 ? phState(cur+1)==="open" : false;
+  $("#phPanel").innerHTML=`<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><h3>${p.n}. ${p.t}</h3>${badge}</div>${p.body}
+   <div class="btns" style="margin-top:4px">${cur>0?'<button class="btn" id="phPrev">← Anterior</button>':""}${cur<phases.length-1?`<button class="btn primary" id="phNext" ${next?"":"disabled"}>Siguiente fase →</button>`:""}</div>
+   ${cur===1&&!next?'<p style="font-size:.9rem;color:var(--muted)">La fase 3 se desbloquea cuando la tutora valida el tema.</p>':""}`;
+  $$("#phases .ph").forEach(b=>b.addEventListener("click",()=>{const i=+b.dataset.i; if(phState(i)==="open"){cur=i;renderPhases();}}));
+  $("#phPrev")&&$("#phPrev").addEventListener("click",()=>{cur--;renderPhases();});
+  $("#phNext")&&$("#phNext").addEventListener("click",()=>{cur++;renderPhases();});
+  $$("#phPanel [data-v]").forEach(b=>b.addEventListener("click",()=>{
+    validated=b.dataset.v;
+    if(validated==="no"){cur=0;renderPhases();
+      $("#phPanel").insertAdjacentHTML("afterbegin",'<div class="note" style="border-color:var(--brand);background:var(--brand-soft)"><b>Propuesta no validada.</b> Revisa las indicaciones de la tutora, reformula la ficha y vuelve a presentarla.</div>');
+      validated=null; return;}
+    renderPhases();
+  }));
+}
+renderPhases();
+
+/* ---------- Estructura ---------- */
+const struct=[
+ ["Portada","ob","Título, nombre del alumno o alumna, ciclo, módulo, centro, tutora, curso académico y fecha de entrega."],
+ ["Resumen y palabras clave","ob","150–250 palabras con el problema, el objetivo, la metodología, el producto y la conclusión principal. De 3 a 5 palabras clave, preferiblemente descriptores DeCS/MeSH. Muchos centros piden también el resumen en inglés (abstract). Se escribe al final."],
+ ["Índice","ob","Paginado y generado automáticamente desde los estilos de título del procesador de textos. Incluye índice de tablas y figuras si hay varias."],
+ ["Introducción y justificación","ob","Contexto, problema y razones del proyecto, siguiendo el embudo. Termina con el propósito. Incluye la justificación intermodular: qué módulos intervienen y cómo."],
+ ["Marco teórico","ob","Conceptos y conocimiento actual necesario para entender el proyecto, siempre con citas. En proyectos de FP puede ir integrado en la introducción si es breve."],
+ ["Objetivos","ob","Un objetivo general y de 3 a 5 específicos, en infinitivo y medibles."],
+ ["Metodología","ob","Tipo de proyecto (consulta el apartado <a href=\"#metodologias\">Metodologías</a>), ámbito, población o destinatarios, estrategia de búsqueda bibliográfica (consulta <a href=\"#revision\">Revisión bibliográfica</a>), fases de trabajo e instrumentos."],
+ ["Desarrollo / Resultados","ob","El producto del proyecto: la guía, el protocolo, el plan o los datos obtenidos. Organizado según los objetivos específicos, para que se vea que se cumplen uno a uno. En una revisión bibliográfica: diagrama de flujo, tabla de artículos incluidos y síntesis por temas."],
+ ["Discusión y conclusiones","ob","Respuesta a cada objetivo, comparación con lo que dice la bibliografía y aportación del proyecto. Sin datos nuevos."],
+ ["Referencias","ob","Lista en APA 7, orden alfabético, sangría francesa. Solo fuentes citadas en el texto."]
+];
+$("#struct").innerHTML=struct.map(([t,k,d])=>`<details><summary><b>${t}</b></summary><div class="b"><p>${d}</p></div></details>`).join("");
+
+/* ---------- Embudo ---------- */
+const funnel=[
+ ["Contexto general","La codificación clínica transforma la información de la historia clínica en códigos normalizados que alimentan el Conjunto Mínimo Básico de Datos (CMBD), la financiación y la planificación sanitaria (Autor, año)."],
+ ["Problema","Sin embargo, la codificación está expuesta a errores derivados de informes de alta incompletos, de la complejidad de la CIE-10-ES y de la presión asistencial (Autor, año)."],
+ ["Consecuencias","Estos errores alteran la asignación de los Grupos Relacionados por el Diagnóstico (GRD), distorsionan los indicadores de actividad y reducen la fiabilidad de los datos para la investigación (Autor, año)."],
+ ["Lo que falta","Las recomendaciones insisten en la auditoría periódica como herramienta de control, pero en el servicio de referencia no existe un procedimiento normalizado que indique qué revisar, con qué frecuencia y cómo registrar los resultados."],
+ ["Propósito","Por ello, este proyecto propone un procedimiento de auditoría interna de la calidad de la codificación CIE-10-ES de las altas hospitalarias de un servicio de Medicina Interna."]
+];
+$("#funnel").innerHTML=funnel.map((f,i)=>`<button aria-pressed="${i===0}" data-i="${i}" style="width:${100-i*13}%">${i+1}. ${f[0]}</button>`).join("");
+function showF(i){
+  $$("#funnel button").forEach((b,j)=>b.setAttribute("aria-pressed",j===i));
+  $("#funnelTxt").innerHTML=`<p class="ref">${esc(funnel[i][1])}</p>`;
+}
+$$("#funnel button").forEach(b=>b.addEventListener("click",()=>showF(+b.dataset.i))); showF(0);
+
+/* ---------- Comprobador de objetivos ---------- */
+const vague=["conocer","saber","entender","comprender","aprender","ver","estudiar","investigar","profundizar","reflexionar","mejorar","tratar","intentar","hacer","informarse","acercarse"];
+const good=["identificar","describir","enumerar","definir","clasificar","analizar","comparar","relacionar","examinar","determinar","diseñar","elaborar","desarrollar","proponer","planificar","evaluar","valorar","verificar","medir","contrastar","implementar","crear","establecer","cuantificar","explicar","aplicar","organizar","seleccionar","unificar","revisar","adaptar","validar","estimar"];
+function checkObj(){
+  const raw=$("#objIn").value.trim(), out=$("#objOut");
+  if(!raw){out.className="verdict note warn";out.innerHTML="Escribe un objetivo para revisarlo.";return;}
+  const first=raw.split(/\s+/)[0].toLowerCase().replace(/[^a-záéíóúñü]/g,"");
+  const words=raw.split(/\s+/).length, tips=[];
+  let level="ok";
+  if(!/(ar|er|ir)$/.test(first)){level="bad";tips.push(`Empieza por un verbo en infinitivo. «${esc(first)}» no lo parece.`);}
+  else if(vague.includes(first)){level="bad";tips.push(`«${esc(first)}» es un verbo difícil de medir. Prueba con: identificar, describir, analizar, diseñar o evaluar.`);}
+  else if(!good.includes(first)){level="warn";tips.push(`«${esc(first)}» puede servir; comprueba que describe una acción observable.`);}
+  if(words<6){level=level==="ok"?"warn":level;tips.push("Es muy corto: añade qué, a quién o dónde y con qué.");}
+  if(words>40){level=level==="ok"?"warn":level;tips.push("Es muy largo: quizá contiene dos objetivos. Divídelo.");}
+  if(/\by\s+(identificar|describir|analizar|diseñar|elaborar|evaluar|comparar)\b/i.test(raw)){level=level==="ok"?"warn":level;tips.push("Contiene dos verbos de acción: cada objetivo debe tener uno.");}
+  if(level==="ok") tips.push("Bien formulado: verbo medible en infinitivo y contenido concreto.");
+  out.className="verdict note "+(level==="ok"?"ok":level==="warn"?"warn":"");
+  if(level==="bad") out.style.cssText="border-color:var(--brand);background:var(--brand-soft)"; else out.style.cssText="";
+  out.innerHTML=`<ul class="tight">${tips.map(t=>`<li>${t}</li>`).join("")}</ul>`;
+}
+$("#objBtn").addEventListener("click",checkObj);
+$("#objIn").addEventListener("keydown",e=>{if(e.key==="Enter")checkObj();});
+checkObj();
+
+
+/* ---------- Generador APA ---------- */
+function authorsRef(list){
+  if(!list.length) return "";
+  if(list.length===1) return list[0];
+  if(list.length<=20) return list.slice(0,-1).join(", ")+" y "+list[list.length-1];
+  return list.slice(0,19).join(", ")+", … "+list[list.length-1];
+}
+function surname(a){return a.split(",")[0].trim();}
+function citeNames(list){
+  if(!list.length) return "Título abreviado";
+  if(list.length===1) return surname(list[0]);
+  if(list.length===2) return surname(list[0])+" y "+surname(list[1]);
+  return surname(list[0])+" et al.";
+}
+const v=id=>$("#"+id).value.trim();
+function endDot(s){return /[.?!]$/.test(s)?s:s+".";}
+function gen(){
+  const type=v("gType");
+  $$("[data-for]").forEach(el=>el.hidden=!el.dataset.for.split(" ").includes(type));
+  const auth=$("#gAuth").value.split("\n").map(s=>s.trim()).filter(Boolean).map(a=>/\.$/.test(a)?a:a+".");
+  const year=v("gYear")||"s. f.", title=v("gTitle"), link=v("gLink"), ed=v("gEd");
+  const A=auth.length?endDot(authorsRef(auth).replace(/\.\.$/,"."))+" ":"";
+  let ref="";
+  const edTxt=ed?` (${esc(ed)} ed.)`:"";
+  if(type==="art"){
+    const vol=v("gVol"),num=v("gNum"),pag=v("gPag");
+    ref=`${esc(A)}(${esc(year)}). ${esc(endDot(title))} <i>${esc(v("gSrc"))}</i>${vol?`, <i>${esc(vol)}</i>`:""}${num?`(${esc(num)})`:""}${pag?`, ${esc(pag)}`:""}.`;
+  }else if(type==="book"){
+    ref=`${esc(A)}(${esc(year)}). <i>${esc(title)}</i>${edTxt}. ${v("gPub")?esc(endDot(v("gPub"))):""}`;
+  }else if(type==="chap"){
+    const pag=v("gPag");
+    ref=`${esc(A)}(${esc(year)}). ${esc(endDot(title))} En ${esc(v("gBook")||"Editor (Ed.), Título del libro")}${edTxt}${pag?` (pp. ${esc(pag)})`:""}. ${v("gPub")?esc(endDot(v("gPub"))):""}`;
+  }else{
+    ref=`${esc(A)}(${esc(year)}). <i>${esc(title)}</i>. ${v("gPub")?esc(endDot(v("gPub"))):""}`;
+  }
+  if(link) ref=ref.trim()+" "+esc(link);
+  $("#gRef").innerHTML=ref.trim();
+  const n=citeNames(auth);
+  $("#gPar").textContent=`(${n}, ${year})`;
+  $("#gNar").textContent=`${n} (${year})`;
+}
+$$("#generador input, #generador textarea, #generador select").forEach(el=>el.addEventListener("input",gen));
+gen();
+$("#gCopy").addEventListener("click",()=>{
+  const txt=$("#gRef").textContent, ok=$("#gCopyOk");
+  const sel=()=>{const r=document.createRange();r.selectNodeContents($("#gRef"));const s=getSelection();s.removeAllRanges();s.addRange(r);ok.textContent="Texto seleccionado: cópialo con Ctrl+C (en Word, aplica la cursiva).";};
+  try{ navigator.clipboard.writeText(txt).then(()=>ok.textContent="Copiada. Al pegarla en Word, revisa la cursiva.",sel); }catch(e){ sel(); }
+});
+
+/* ---------- Glosario ---------- */
+const glo=[["DOI","Identificador permanente de un documento digital. En APA se escribe como enlace: https://doi.org/…"],["et al.","«Y otros». Se usa en la cita del texto a partir de tres autores."],["Sangría francesa","La primera línea de cada referencia sale al margen y las siguientes van sangradas 1,27 cm."],["Cita parentética","Autor y año entre paréntesis al final de la idea: (García, 2024)."],["Cita narrativa","El autor forma parte de la frase: García (2024) afirma…"],["Paráfrasis","Explicar la idea de otro con tus palabras, citando la fuente."],["DeCS / MeSH","Vocabularios controlados de descriptores en ciencias de la salud, útiles para buscar y como palabras clave."],["Fuente primaria","Documento original: un artículo de investigación, una ley, un informe oficial."],["Anteproyecto","Planificación detallada que se hace tras la validación del tema."],["Plagio","Presentar como propio un texto, idea, tabla o imagen ajena sin citarla."],["Alucinación","Respuesta de una IA que suena correcta pero es falsa, como un artículo o una norma que no existen."]];
+$("#flips").innerHTML=glo.map(([a,b])=>`<button class="flip" aria-pressed="false" aria-label="${esc(a)}: ver definición"><div class="flip-in"><div class="face front">${esc(a)}</div><div class="face back">${esc(b)}</div></div></button>`).join("");
+$$(".flip").forEach(f=>f.addEventListener("click",()=>f.setAttribute("aria-pressed",f.getAttribute("aria-pressed")!=="true")));
+
+/* ---------- Quiz ---------- */
+const Q=[
+ ["¿Cuándo se puede empezar la planificación del proyecto?",["Nada más elegir el tema","Cuando la tutora valida la propuesta","Después de redactar la introducción","En la semana de la entrega"],1,"La validación es la puerta: hasta que la tutora no valida el tema (con o sin modificaciones), no se pasa a la planificación."],
+ ["Un artículo de tres autores (Martín, Soto y Vidal, 2023) se cita en el texto como…",["(Martín, Soto y Vidal, 2023)","(Martín y col., 2023)","(Martín et al., 2023)","(Martín, 2023)"],2,"Desde APA 7, con tres o más autores se escribe el primero seguido de et al. desde la primera cita."],
+ ["¿Cuál de estos objetivos está mejor formulado?",["Conocer la codificación CIE-10-ES","Saber más sobre el archivo","Diseñar un procedimiento de préstamo de historias clínicas en un archivo hospitalario","Estudiar las emergencias"],2,"Empieza por un verbo medible (diseñar) y concreta qué y para quién."],
+ ["¿Qué va en cursiva en la referencia de un artículo?",["El título del artículo","El nombre de la revista y el volumen","El número del fascículo","Los autores"],1,"Revista y volumen en cursiva; el número del fascículo entre paréntesis sin cursiva."],
+ ["La introducción debe terminar con…",["Las conclusiones","La historia de la técnica","El propósito del proyecto","La lista de referencias"],2,"El embudo acaba en lo concreto: qué se propone hacer, que enlaza con los objetivos."],
+ ["En una ecuación de búsqueda, ¿qué operador une sinónimos como «clinical coding» y «medical coding»?",["AND","OR","NOT","Comillas"],1,"OR suma sinónimos del mismo concepto y amplía la búsqueda; AND une conceptos distintos y la restringe."],
+ ["Quieres medir qué porcentaje de informes de alta de un servicio tiene el diagnóstico principal bien cumplimentado. ¿Qué metodología es?",["Revisión bibliográfica","Estudio descriptivo (auditoría)","Diseño de herramienta","Metaanálisis"],1,"Se observa y mide una realidad sin intervenir: es un estudio descriptivo, en forma de auditoría de documentación."],
+ ["La IA te ofrece cinco referencias sobre codificación clínica. ¿Qué haces?",["Las copio en la lista de referencias","Las cito solo en la introducción","Busco cada una en su base de datos, la leo y solo uso las que existen","Pongo la IA como autora"],2,"La IA puede inventar referencias verosímiles. Solo citas lo que has localizado y consultado."],
+ ["¿Qué forma la entrega final del proyecto?",["Solo la presentación","El trabajo completo junto con la presentación","La última entrega parcial","La ficha de propuesta"],1,"La entrega final es el trabajo completo más la presentación. Las entregas parciales se realizan antes, y no entregar cualquiera de ellas supone suspender el proyecto."],
+ ["¿Qué hace que un proyecto sea intermodular?",["Que sea largo","Que integre contenidos de varios módulos del ciclo","Que lo hagan varios alumnos","Que tenga anexos"],1,"Debe conectar competencias de distintos módulos y justificar qué aporta cada uno."],
+ ["En la lista de referencias, ¿cómo se ordenan las entradas?",["Por orden de aparición en el texto","Por año","Alfabéticamente por el apellido del primer autor","Por tipo de fuente"],2,"APA ordena alfabéticamente por el primer elemento de la referencia (normalmente el apellido del primer autor)."]
+];
+let qi=0,score=0,answered=false;
+function renderQ(){
+  const box=$("#quiz");
+  if(qi>=Q.length){box.innerHTML=`<h3>Resultado: ${score} de ${Q.length}</h3><p>${score===Q.length?"Perfecto. Estás listo para la memoria.":score>=Q.length-2?"Muy bien. Repasa las preguntas falladas.":"Repasa los apartados de citas, objetivos y fases."}</p><div class="btns"><button class="btn primary" id="qR">Repetir</button></div>`;$("#qR").onclick=()=>{qi=0;score=0;renderQ();};return;}
+  const [p,o,c,e]=Q[qi]; answered=false;
+  box.innerHTML=`<div class="q-meta"><span>Pregunta ${qi+1} de ${Q.length}</span><span>Aciertos: ${score}</span></div><h3>${esc(p)}</h3><div class="q-opts">${o.map((x,i)=>`<button data-i="${i}">${esc(x)}</button>`).join("")}</div><div id="qExp" aria-live="polite"></div>`;
+  $$("#quiz .q-opts button").forEach(b=>b.addEventListener("click",()=>{
+    if(answered)return; answered=true; const i=+b.dataset.i;
+    if(i===c)score++;
+    $$("#quiz .q-opts button").forEach((x,j)=>{if(j===c)x.classList.add("right");else if(j===i)x.classList.add("wrong");});
+    $("#qExp").innerHTML=`<div class="note ${i===c?"ok":"warn"}"><b>${i===c?"Correcto.":"No es esa."}</b> ${esc(e)}</div><div class="btns" style="margin-top:10px"><button class="btn primary" id="qN">${qi<Q.length-1?"Siguiente":"Ver resultado"}</button></div>`;
+    $("#qN").onclick=()=>{qi++;renderQ();};
+  }));
+}
+renderQ();
+
+/* ---------- Checklist ---------- */
+const items=["Has realizado todas las entregas parciales en plazo.","El tema está validado por la tutora y figura así en la memoria.","La entrega final incluye el trabajo completo y la presentación.","El título es concreto (población, lugar, producto).","La introducción sigue el embudo y termina con el propósito.","Hay un objetivo general y 3–5 específicos en infinitivo.","Cada objetivo específico tiene su reflejo en los resultados.","Se justifica qué módulos del ciclo intervienen.","La metodología explica la búsqueda bibliográfica.","Cada cita del texto está en Referencias y viceversa.","Referencias en APA 7, orden alfabético y sangría francesa.","Tablas y figuras numeradas, con título y nota.","Formato: márgenes, fuente, interlineado y paginación.","Resumen y palabras clave escritos al final.","Si has usado IA, lo declaras y has verificado cada dato y cada referencia.","Revisión ortográfica completa."];
+let saved={}; try{saved=JSON.parse(localStorage.getItem("pi-chk")||"{}")}catch(e){}
+$("#chk").innerHTML=items.map((t,i)=>`<label><input type="checkbox" id="c${i}" ${saved[i]?"checked":""}><span>${esc(t)}</span></label>`).join("");
+function upd(){
+  const st={}; let n=0; items.forEach((_,i)=>{if($("#c"+i).checked){st[i]=1;n++;}});
+  $("#chkTxt").textContent=`${n} de ${items.length} comprobados`; $("#chkBar").style.width=(n/items.length*100)+"%";
+  try{localStorage.setItem("pi-chk",JSON.stringify(st))}catch(e){}
+}
+$$("#chk input").forEach(c=>c.addEventListener("change",upd)); upd();
+
+/* ---------- Búsqueda ---------- */
+const idx=$$("main section[id]").map(s=>({id:s.id,title:(s.querySelector("h2")||{}).textContent||"",text:s.textContent.replace(/\s+/g," ")}));
+const qIn=$("#q"), qRes=$("#qres");
+const norm=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+qIn.addEventListener("input",()=>{
+  const t=norm(qIn.value.trim());
+  if(t.length<2){qRes.hidden=true;return;}
+  const hits=idx.map(s=>{const n=norm(s.text),p=n.indexOf(t);return p<0?null:{...s,snip:s.text.slice(Math.max(0,p-40),p+70)};}).filter(Boolean);
+  qRes.innerHTML=hits.length?hits.map(h=>`<button data-id="${h.id}">${esc(h.title)}<em>…${esc(h.snip)}…</em></button>`).join(""):'<button disabled>Sin resultados</button>';
+  qRes.hidden=false;
+  $$("#qres button[data-id]").forEach(b=>b.addEventListener("click",()=>{
+    const s=document.getElementById(b.dataset.id); s.querySelectorAll("details").forEach(d=>{if(norm(d.textContent).includes(t))d.open=true;});
+    s.scrollIntoView({behavior:"smooth"}); qRes.hidden=true;
+  }));
+});
+document.addEventListener("click",e=>{if(!e.target.closest(".search"))qRes.hidden=true;});
+})();
+</script>
+
+</body></html>
