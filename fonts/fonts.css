@@ -1,0 +1,4 @@
+/* Tipografías servidas localmente (licencia SIL OFL / Apache, ver LICENSE-*.txt) */
+@font-face{font-family:'Literata';font-style:normal;font-weight:200 900;font-display:swap;src:url('literata-latin-opsz-normal.woff2') format('woff2')}
+@font-face{font-family:'Source Sans 3';font-style:normal;font-weight:200 900;font-display:swap;src:url('source-sans-3-latin-wght-normal.woff2') format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:100 800;font-display:swap;src:url('jetbrains-mono-latin-wght-normal.woff2') format('woff2')}
